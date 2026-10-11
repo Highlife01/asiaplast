@@ -1,0 +1,59 @@
+rules_version = '2';
+
+// ASIAPLAST — ajansonline project
+// All public content is rendered server-side via the Admin SDK (bypasses rules).
+// Clients may NOT read or write business data directly. Forms POST to /api/*.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function hasRole(role) {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && request.auth.token.roles != null
+        && role in request.auth.token.roles;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    // Business collections — admin-only via custom claims.
+    match /contactMessages/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if false; // created only by /api/contact (Admin SDK)
+    }
+
+    match /quoteRequests/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if false; // created only by /api/quotes (Admin SDK)
+    }
+
+    match /orders/{id}        { allow read, write: if isAdmin(); }
+    match /orderEvents/{id}   { allow read, write: if isAdmin(); }
+    match /customers/{id}     { allow read, write: if isAdmin(); }
+    match /distributors/{id}  { allow read, write: if isAdmin(); }
+    match /products/{id}      { allow read: if isAdmin(); allow write: if isAdmin(); }
+    match /categories/{id}    { allow read: if isAdmin(); allow write: if isAdmin(); }
+    match /blogPosts/{id}     { allow read, write: if isAdmin(); }
+    match /pages/{id}         { allow read, write: if isAdmin(); }
+    match /seoSettings/{id}   { allow read, write: if isAdmin(); }
+    match /mediaAssets/{id}   { allow read, write: if isAdmin(); }
+    match /notifications/{id} { allow read, write: if isAdmin(); }
+    match /auditLogs/{id}     { allow read, create: if isAdmin(); allow update, delete: if false; }
+    match /settings/{id}      { allow read, write: if isAdmin(); }
+
+    match /users/{uid} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if false; // claims managed by Admin SDK scripts only
+    }
+
+    // Deny everything else.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

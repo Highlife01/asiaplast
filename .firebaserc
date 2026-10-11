@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "ajansonline"
+  },
+  "targets": {
+    "ajansonline": {
+      "hosting": {
+        "asiaplast": ["asiaplast"]
+      }
+    }
+  }
+}

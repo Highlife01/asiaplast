@@ -230,33 +230,41 @@ export default function HeroSlider({ locale, labels }: Props) {
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
         >
-            {/* 4K Background Images with Smooth Cross-Fade */}
-            <div className="absolute inset-0 -z-10 overflow-hidden">
-                {SLIDES.map((slide, idx) => (
-                    <div
-                        key={slide.image}
-                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                            idx === current ? "opacity-100 scale-100" : "opacity-0 scale-105"
-                        } transform transition-transform duration-[7000ms]`}
-                        style={{
-                            backgroundImage: `url(${slide.image})`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center"
-                        }}
-                    >
-                        {/* Cinematic Multi-Layer Dark Gradient Overlay for Supreme Text Contrast */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/40" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/70" />
-                        <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]" />
-                    </div>
-                ))}
+            {/* 4K Background Visual Showcase */}
+            <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                {SLIDES.map((slide, idx) => {
+                    const isCurrent = idx === current;
+                    const slideTitle = slide.title[locale] || slide.title.en || "AsiaPlast";
+                    return (
+                        <div
+                            key={slide.image}
+                            aria-hidden={!isCurrent}
+                            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                                isCurrent ? "opacity-100" : "opacity-0"
+                            }`}
+                        >
+                            <img
+                                src={slide.image}
+                                alt={slideTitle}
+                                fetchPriority={idx === 0 ? "high" : "auto"}
+                                loading={idx === 0 ? "eager" : "lazy"}
+                                className={`absolute inset-0 w-full h-full object-cover object-center transform transition-transform duration-[8000ms] ${
+                                    isCurrent ? "scale-105" : "scale-100"
+                                }`}
+                            />
+                            {/* Professional industrial gradient: dark on left for typography readability, clear on right for 4K visuals */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/70 via-45% to-slate-950/15" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent via-60% to-slate-950/40" />
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Subtle Tech Grid Texture */}
-            <div className="hero-grid absolute inset-0 -z-10 opacity-30 pointer-events-none" />
+            <div className="hero-grid absolute inset-0 z-0 opacity-20 pointer-events-none" />
 
             {/* Main Slide Content */}
-            <div className="container-x relative pt-20 sm:pt-28 pb-12 flex-1 flex flex-col justify-center">
+            <div className="container-x relative z-10 pt-20 sm:pt-28 pb-12 flex-1 flex flex-col justify-center">
                 <div className="max-w-3xl space-y-6">
                     {/* Badge / Pill */}
                     <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-xs font-black tracking-widest uppercase shadow-lg shadow-emerald-950/40 backdrop-blur-md">
@@ -340,7 +348,7 @@ export default function HeroSlider({ locale, labels }: Props) {
             </div>
 
             {/* Bottom Strip: 5 Slide Indicators with Titles & Progress Bar */}
-            <div className="border-t border-white/10 bg-slate-950/80 backdrop-blur-md py-4">
+            <div className="relative z-10 border-t border-white/10 bg-slate-950/85 backdrop-blur-md py-4">
                 <div className="container-x">
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                         {SLIDES.map((slide, i) => {
@@ -382,7 +390,7 @@ export default function HeroSlider({ locale, labels }: Props) {
             </div>
 
             {/* Marquee Ticker */}
-            <div className="relative border-t border-white/10 bg-black/40 py-2.5 overflow-hidden" aria-hidden>
+            <div className="relative z-10 border-t border-white/10 bg-black/60 py-2.5 overflow-hidden" aria-hidden>
                 <div className="marquee flex w-max gap-8 font-mono text-[11px] uppercase tracking-[.25em] text-slate-400">
                     {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((kw, i) => (
                         <span key={`${kw}-${i}`} className="whitespace-nowrap flex items-center gap-4">

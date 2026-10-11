@@ -103,6 +103,37 @@ export default async function ProductDetailPage({ params }: Props) {
             <section className="section">
                 <div className="container-x grid gap-10 lg:grid-cols-[1.2fr_.8fr]">
                     <div>
+                        {/* 4K Product Showcase Image */}
+                        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-3xl border border-slate-200/90 shadow-xl mb-8 bg-slate-100">
+                            <img
+                                src={
+                                    product.categoryId === "heavy-duty"
+                                        ? "/images/products/heavy-duty.jpg"
+                                        : product.categoryId === "household"
+                                        ? "/images/products/household.jpg"
+                                        : product.categoryId === "industrial-liners"
+                                        ? "/images/products/industrial-liners.jpg"
+                                        : product.categoryId === "drawstring"
+                                        ? "/images/products/drawstring.jpg"
+                                        : product.categoryId === "colored"
+                                        ? "/images/products/colored.jpg"
+                                        : product.categoryId === "private-label"
+                                        ? "/images/products/private-label.jpg"
+                                        : "/images/products/star-seal.jpg"
+                                }
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                            />
+                            <div className="absolute bottom-4 left-4 flex flex-wrap gap-2">
+                                <span className="px-3 py-1 rounded-full bg-slate-950/85 backdrop-blur-md text-xs font-bold text-emerald-300 border border-emerald-500/30 shadow-lg">
+                                    Export Grade Polyethylene
+                                </span>
+                                <span className="px-3 py-1 rounded-full bg-slate-950/85 backdrop-blur-md text-xs font-bold text-white border border-white/20 shadow-lg">
+                                    EN 13592 &bull; ASTM D1709 Tested
+                                </span>
+                            </div>
+                        </div>
+
                         <h2 className="h2-title !text-2xl">Overview</h2>
                         <p className="mt-4 leading-relaxed text-slate-600">{product.description}</p>
 

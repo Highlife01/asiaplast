@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
+import WhatsAppButton from "@/components/site/WhatsAppButton";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { ACTIVE_LOCALES, isLocale, type Locale } from "@/lib/i18n/locales";
 
@@ -43,6 +44,7 @@ export default async function LocaleLayout({
                     admin: dict.footer.admin
                 }}
             />
+            <WhatsAppButton locale={locale} />
         </>
     );
 }

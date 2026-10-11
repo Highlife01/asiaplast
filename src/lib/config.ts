@@ -5,7 +5,7 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://asiaplast.
 export const COMPANY = {
     name: "ASIAPLAST",
     email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "export@asiaplast.com",
-    whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || "",
+    whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || "+905336840175",
     country: process.env.NEXT_PUBLIC_CONTACT_COUNTRY || "Turkey"
 } as const;
 

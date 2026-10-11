@@ -516,7 +516,7 @@ export default function AdminDashboardClient({
                                         <p>localStorage: <span className="text-rose-400 font-black">DISABLED (Strict Rule)</span></p>
                                         <p>sessionStorage: <span className="text-rose-400 font-black">DISABLED</span></p>
                                         <p>IndexedDB: <span className="text-rose-400 font-black">DISABLED</span></p>
-                                        <p>Session Cookie: <span className="text-emerald-300 font-bold">ap_admin_session (HttpOnly, Secure)</span></p>
+                                        <p>Session Cookie: <span className="text-emerald-300 font-bold">__session (Firebase Compatible, HttpOnly, Secure)</span></p>
                                         <p>Signature Alg: <span className="text-slate-400">HMAC-SHA256</span></p>
                                     </div>
                                 </div>

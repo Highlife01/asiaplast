@@ -29,7 +29,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     const { locale } = await params;
     const l = localeOrDefault(locale);
     const dict = getDictionary(l);
-    const products = await loadCatalogProducts();
+    const products = await loadCatalogProducts(l);
     const industries = getIndustries(l);
 
     const why = [

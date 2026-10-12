@@ -95,6 +95,25 @@ export function ProductCard({
     );
 }
 
+const CATEGORY_TO_PRODUCT: Record<string, string> = {
+    "heavy-duty": "heavy-duty-garbage-bags",
+    "household": "household-garbage-bags",
+    "industrial-liners": "industrial-bin-liners",
+    "drawstring": "drawstring-garbage-bags",
+    "star-seal": "star-seal-garbage-bags",
+    "colored": "colored-garbage-bags",
+    "custom-size": "custom-size-trash-bags",
+    "private-label": "private-label-garbage-bags"
+};
+
+const EXPLORE_LABELS: Partial<Record<Locale, string>> = {
+    tr: "Teknik Özellikleri İncele",
+    en: "Explore Technical Specs",
+    de: "Technische Daten ansehen",
+    fr: "Fiche Technique Complète",
+    ar: "استعراض المواصفات الفنية"
+};
+
 export function CategoryCard({
     category,
     locale
@@ -105,11 +124,14 @@ export function CategoryCard({
     const copy = getCategoryCopy(locale, category.id);
     const imageUrl = CATEGORY_IMAGES[category.id] || "/images/products/heavy-duty.jpg";
     const spec = CATEGORY_SPECS[category.id] || "Standard B2B Bulk";
+    const productSlug = CATEGORY_TO_PRODUCT[category.id] || "heavy-duty-garbage-bags";
+    const href = localePath(locale, `/products/${localizedSlug(productSlug, locale)}`);
+    const exploreLabel = EXPLORE_LABELS[locale] || EXPLORE_LABELS.en;
 
     return (
         <Link
             id={category.id}
-            href={`${localePath(locale, "/products")}#${category.id}`}
+            href={href}
             className="group relative rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden"
         >
             <div>
@@ -143,7 +165,7 @@ export function CategoryCard({
             </div>
 
             <div className="mt-4 pt-3 border-t border-slate-100 px-1 flex items-center justify-between text-xs font-bold text-brand-green">
-                <span>Explore Technical Specs</span>
+                <span>{exploreLabel}</span>
                 <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
             </div>
         </Link>

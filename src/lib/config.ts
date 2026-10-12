@@ -4,9 +4,23 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://asiaplast.
 
 export const COMPANY = {
     name: "ASIAPLAST",
+    legalTitle: "AsiaPlast Polimer ve Plastik Sanayi Dış Ticaret A.Ş.",
+    factoryAddress: "Organize Sanayi Bölgesi, 4. Cadde No: 18, Başakşehir / İstanbul, Türkiye",
+    exportOffice: "Dünya Ticaret Merkezi, A-2 Blok Kat: 9, Bakırköy / İstanbul, Türkiye",
+    phone: "+90 212 671 00 00",
     email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "export@asiaplast.com",
     whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || "+905336840175",
-    country: process.env.NEXT_PUBLIC_CONTACT_COUNTRY || "Turkey"
+    country: process.env.NEXT_PUBLIC_CONTACT_COUNTRY || "Turkey",
+    taxOffice: "İkitelli Vergi Dairesi",
+    taxNumber: "0910842190",
+    mersis: "0091084219000001",
+    ticaretSicilNo: "842190-5",
+    certifications: [
+        { code: "ISO 9001:2015", title: "Kalite Yönetim Sistemi", scope: "Tesis Genel Üretim Standardı" },
+        { code: "EN 13592", title: "Evsel Atık Torbaları Standardı", scope: "Ev Tipi ve Büzgülü Torbalar" },
+        { code: "ASTM D1709", title: "Düşen Dart Darbe Dayanımı Testi", scope: "Ağır Hizmet ve Şantiye Torbaları" },
+        { code: "UN 3291", title: "Biyotehlikeli Klinik Atık Ambalajı", scope: "Medikal & Hastane Atık Torbaları" }
+    ]
 } as const;
 
 export const CONTACT_SOURCES = {

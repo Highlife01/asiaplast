@@ -46,10 +46,11 @@ export default async function QuotePage({
                     { name: dict.nav.quote, path: localePath(l, "/quote") }
                 ])}
             />
-            <section className="hero-bg py-16 text-white sm:py-20">
+            <section className="hero-bg border-b border-slate-200/80 py-16 text-slate-900 sm:py-20">
                 <div className="container-x">
-                    <h1 className="font-display text-4xl font-extrabold sm:text-5xl">{dict.quote.title}</h1>
-                    <p className="mt-4 max-w-2xl text-slate-300">{dict.quote.lead}</p>
+                    <p className="chip mb-3">Fast Quotation Desk</p>
+                    <h1 className="font-display text-4xl font-black text-slate-900 sm:text-5xl">{dict.quote.title}</h1>
+                    <p className="mt-4 max-w-2xl text-slate-600 text-base sm:text-lg leading-relaxed">{dict.quote.lead}</p>
                 </div>
             </section>
 
@@ -64,17 +65,17 @@ export default async function QuotePage({
                     />
                     <aside className="space-y-4">
                         {dict.faq.slice(0, 3).map((f) => (
-                            <details key={f.q} className="card p-5">
-                                <summary className="cursor-pointer list-none font-display text-sm font-bold text-brand-navy">
-                                    <span className="mr-2 text-brand-green">▸</span>
-                                    {f.q}
+                            <details key={f.q} className="card p-6 group open:border-emerald-500/40">
+                                <summary className="cursor-pointer list-none font-display text-sm font-bold text-slate-900 flex items-center justify-between">
+                                    <span>{f.q}</span>
+                                    <span className="text-brand-green font-bold transition-transform duration-200 group-open:rotate-90">▸</span>
                                 </summary>
-                                <p className="mt-3 text-sm leading-relaxed text-slate-600">{f.a}</p>
+                                <p className="mt-3 text-sm leading-relaxed text-slate-600 pt-2 border-t border-slate-100">{f.a}</p>
                             </details>
                         ))}
-                        <div className="card p-5">
-                            <h3 className="font-display text-sm font-bold text-brand-navy">{dict.sections.why4Title}</h3>
-                            <p className="mt-2 text-sm text-slate-600">{dict.sections.why4Text}</p>
+                        <div className="card p-6 hover:border-emerald-500/40 transition-all">
+                            <h3 className="font-display text-sm font-bold text-slate-900">{dict.sections.why4Title}</h3>
+                            <p className="mt-2 text-sm leading-relaxed text-slate-600">{dict.sections.why4Text}</p>
                         </div>
                     </aside>
                 </div>

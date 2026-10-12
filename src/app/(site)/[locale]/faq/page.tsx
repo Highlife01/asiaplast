@@ -33,25 +33,26 @@ export default async function FaqPage({ params }: { params: Promise<{ locale: st
         <>
             <JsonLd data={faqJsonLd([...dict.faq])} />
             <JsonLd data={breadcrumbJsonLd([{ name: dict.nav.home, path: localePath(l, "/") }, { name: dict.sections.faqTitle, path: localePath(l, "/faq") }])} />
-            <section className="hero-bg py-16 text-white sm:py-20">
+            <section className="hero-bg border-b border-slate-200/80 py-16 text-slate-900 sm:py-20">
                 <div className="container-x">
-                    <h1 className="font-display text-4xl font-extrabold sm:text-5xl">{dict.sections.faqTitle}</h1>
+                    <p className="chip mb-3">Knowledge Base</p>
+                    <h1 className="font-display text-4xl font-black text-slate-900 sm:text-5xl">{dict.sections.faqTitle}</h1>
                 </div>
             </section>
             <section className="section">
                 <div className="container-x max-w-3xl space-y-4">
                     {dict.faq.map((f) => (
-                        <details key={f.q} className="card p-6">
-                            <summary className="cursor-pointer list-none font-display text-base font-bold text-brand-navy">
-                                <span className="mr-2 text-brand-green">▸</span>
-                                {f.q}
+                        <details key={f.q} className="card p-6 group open:border-emerald-500/40">
+                            <summary className="cursor-pointer list-none font-display text-base font-bold text-slate-900 flex items-center justify-between">
+                                <span>{f.q}</span>
+                                <span className="text-brand-green font-bold transition-transform duration-200 group-open:rotate-90">▸</span>
                             </summary>
-                            <p className="mt-3 text-sm leading-relaxed text-slate-600">{f.a}</p>
+                            <p className="mt-3 text-sm leading-relaxed text-slate-600 pt-3 border-t border-slate-100">{f.a}</p>
                         </details>
                     ))}
-                    <div className="card mt-8 p-6 text-center">
-                        <p className="font-display font-bold text-brand-navy">{dict.sections.ctaTitle}</p>
-                        <Link href={quoteHref} className="btn-primary mt-4">{dict.site.ctaQuote}</Link>
+                    <div className="card mt-10 p-8 text-center bg-gradient-to-b from-white to-slate-50/70 border-slate-200/80">
+                        <p className="font-display text-xl font-bold text-slate-900">{dict.sections.ctaTitle}</p>
+                        <Link href={quoteHref} className="btn-primary mt-4 shadow-cta !px-8 !py-3.5">{dict.site.ctaQuote}</Link>
                     </div>
                 </div>
             </section>

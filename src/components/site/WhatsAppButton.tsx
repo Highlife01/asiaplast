@@ -44,7 +44,7 @@ export default function WhatsAppButton({ locale, phoneNumber = "905336840175" }:
         >
             {/* Hover Tooltip / Desk info pill */}
             <div
-                className={`hidden sm:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-slate-950/95 border border-emerald-500/40 text-slate-100 shadow-2xl backdrop-blur-md transition-all duration-300 opacity-0 group-hover:opacity-100 transform ${
+                className={`hidden sm:flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/95 border border-slate-200 text-slate-800 shadow-xl backdrop-blur-md transition-all duration-300 opacity-0 group-hover:opacity-100 transform ${
                     isRtl
                         ? "order-2 translate-x-2 group-hover:translate-x-0 ml-3"
                         : "order-1 translate-x-2 group-hover:translate-x-0 mr-3"
@@ -55,10 +55,10 @@ export default function WhatsAppButton({ locale, phoneNumber = "905336840175" }:
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                 </span>
                 <div className="flex flex-col text-left">
-                    <span className="text-[11px] font-black text-white tracking-wide">
+                    <span className="text-[11px] font-bold text-slate-900 tracking-wide">
                         {badge.desk}
                     </span>
-                    <span className="text-[10px] text-emerald-400 font-semibold font-mono">
+                    <span className="text-[10px] text-emerald-600 font-bold font-mono">
                         +90 533 684 01 75 &bull; {badge.status}
                     </span>
                 </div>

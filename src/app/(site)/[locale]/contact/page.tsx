@@ -34,10 +34,11 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                     { name: dict.nav.contact, path: localePath(l, "/contact") }
                 ])}
             />
-            <section className="hero-bg py-16 text-white sm:py-20">
+            <section className="hero-bg border-b border-slate-200/80 py-16 text-slate-900 sm:py-20">
                 <div className="container-x">
-                    <h1 className="font-display text-4xl font-extrabold sm:text-5xl">{dict.sections.contactTitle}</h1>
-                    <p className="mt-4 max-w-2xl text-slate-300">{dict.sections.contactLead}</p>
+                    <p className="chip mb-3">Get in Touch</p>
+                    <h1 className="font-display text-4xl font-black text-slate-900 sm:text-5xl">{dict.sections.contactTitle}</h1>
+                    <p className="mt-4 max-w-2xl text-slate-600 text-base sm:text-lg leading-relaxed">{dict.sections.contactLead}</p>
                 </div>
             </section>
 
@@ -46,28 +47,28 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
                     <div>
                         <SectionHeading title={dict.nav.contact} lead={dict.sections.contactLead} />
                         <div className="mt-8 space-y-4">
-                            <div className="card p-5">
-                                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Export desk</h3>
-                                <p className="mt-2 text-sm text-slate-700">
-                                    <a href={`mailto:${COMPANY.email}`} className="font-semibold text-brand-green-dark hover:text-brand-green">{COMPANY.email}</a>
+                            <div className="card p-6 hover:border-emerald-500/40 hover:-translate-y-0.5 transition-all">
+                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">Export desk</h3>
+                                <p className="mt-2 text-sm text-slate-700 leading-relaxed">
+                                    <a href={`mailto:${COMPANY.email}`} className="font-bold text-brand-green hover:text-brand-green-dark">{COMPANY.email}</a>
                                     {COMPANY.whatsapp ? (
                                         <>
                                             <br />
-                                            <a href={`https://wa.me/${COMPANY.whatsapp.replace(/\D/g, "")}`} className="text-brand-green-dark hover:text-brand-green">WhatsApp</a>
+                                            <a href={`https://wa.me/${COMPANY.whatsapp.replace(/\D/g, "")}`} className="font-semibold text-brand-green hover:text-brand-green-dark">WhatsApp: {COMPANY.whatsapp}</a>
                                         </>
                                     ) : null}
-                                    <span className="mt-2 block text-slate-600">{COMPANY.country}</span>
+                                    <span className="mt-2 block text-slate-500">{COMPANY.country}</span>
                                 </p>
                             </div>
-                            <div className="card p-5">
-                                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Distributors</h3>
-                                <p className="mt-2 text-sm text-slate-700">
+                            <div className="card p-6 hover:border-emerald-500/40 hover:-translate-y-0.5 transition-all">
+                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">Distributors</h3>
+                                <p className="mt-2 text-sm text-slate-600 leading-relaxed">
                                     Interested in a long-term distribution partnership? Mention your market and current channels in the message.
                                 </p>
                             </div>
-                            <div className="card p-5">
-                                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Languages</h3>
-                                <p className="mt-2 text-sm text-slate-700">English · Türkçe · Deutsch · Français · العربية</p>
+                            <div className="card p-6 hover:border-emerald-500/40 hover:-translate-y-0.5 transition-all">
+                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">Languages</h3>
+                                <p className="mt-2 text-sm font-medium text-slate-700">English · Türkçe · Deutsch · Français · العربية</p>
                             </div>
                         </div>
                     </div>

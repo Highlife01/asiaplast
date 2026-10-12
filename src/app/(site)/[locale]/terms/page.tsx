@@ -27,18 +27,19 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
     return (
         <>
             <JsonLd data={breadcrumbJsonLd([{ name: dict.nav.home, path: localePath(l, "/") }, { name: copy.title, path: localePath(l, "/terms") }])} />
-            <section className="hero-bg py-16 text-white sm:py-20">
+            <section className="hero-bg border-b border-slate-200/80 py-16 text-slate-900 sm:py-20">
                 <div className="container-x">
-                    <h1 className="font-display text-4xl font-extrabold sm:text-5xl">{copy.title}</h1>
-                    <p className="mt-4 text-slate-300">{copy.updated}</p>
+                    <p className="chip mb-3">Legal</p>
+                    <h1 className="font-display text-4xl font-black text-slate-900 sm:text-5xl">{copy.title}</h1>
+                    <p className="mt-4 text-slate-500 text-sm font-medium">{copy.updated}</p>
                 </div>
             </section>
             <section className="section">
                 <div className="container-x max-w-3xl space-y-8">
                     {copy.sections.map((s) => (
-                        <div key={s.heading}>
-                            <h2 className="font-display text-xl font-bold text-brand-navy">{s.heading}</h2>
-                            <p className="mt-2 leading-relaxed text-slate-600">{s.text}</p>
+                        <div key={s.heading} className="card p-6">
+                            <h2 className="font-display text-xl font-bold text-slate-900">{s.heading}</h2>
+                            <p className="mt-3 leading-relaxed text-slate-600 text-sm">{s.text}</p>
                         </div>
                     ))}
                 </div>

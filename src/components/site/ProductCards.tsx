@@ -42,7 +42,7 @@ export function ProductCard({
     const spec = CATEGORY_SPECS[product.categoryId] || "Export Grade Polyethylene";
 
     return (
-        <article className="group relative rounded-3xl border border-slate-200/90 bg-white p-4 shadow-sm hover:shadow-2xl hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between overflow-hidden">
+        <article className="group relative rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
             <div>
                 {/* Product 4K Image Container with Zoom Effect */}
                 <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-100">
@@ -50,24 +50,24 @@ export function ProductCard({
                         src={imageUrl}
                         alt={product.name}
                         loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
+                        className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/25 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
 
                     {/* Category pill */}
-                    <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-[10px] font-black uppercase tracking-wider text-emerald-300 border border-emerald-500/30">
+                    <span className="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-[10px] font-bold uppercase tracking-wider text-slate-800 border border-slate-200/80 shadow-xs">
                         {category?.icon} {copy.name.split(" ").slice(0, 2).join(" ")}
                     </span>
 
                     {/* Spec Tag */}
-                    <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-sm text-[11px] font-mono font-bold text-white">
+                    <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-md text-[11px] font-mono font-bold text-emerald-800 border border-emerald-200/80 shadow-xs">
                         {spec}
                     </span>
                 </div>
 
                 {/* Details */}
                 <div className="pt-4 px-1">
-                    <h3 className="font-display text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition">
+                    <h3 className="font-display text-lg font-bold text-slate-900 group-hover:text-brand-green transition">
                         <Link href={href}>
                             {product.name}
                         </Link>
@@ -85,7 +85,7 @@ export function ProductCard({
                 </span>
                 <Link
                     href={`${localePath(locale, "/quote")}?product=${product.slug}`}
-                    className="inline-flex items-center gap-1 text-xs font-black text-emerald-600 hover:text-emerald-700 group-hover:translate-x-0.5 transition-transform"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-brand-green hover:text-brand-green-dark group-hover:translate-x-0.5 transition-transform"
                 >
                     <span>{requestLabel}</span>
                     <span>&rarr;</span>
@@ -110,7 +110,7 @@ export function CategoryCard({
         <Link
             id={category.id}
             href={`${localePath(locale, "/products")}#${category.id}`}
-            className="group relative rounded-3xl border border-slate-200/90 bg-white p-4 shadow-sm hover:shadow-2xl hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between overflow-hidden"
+            className="group relative rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden"
         >
             <div>
                 {/* 4K Photographic Visual */}
@@ -119,21 +119,21 @@ export function CategoryCard({
                         src={imageUrl}
                         alt={copy.name}
                         loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
+                        className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-70 group-hover:opacity-40 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
 
-                    <span className="absolute top-3 left-3 text-2xl drop-shadow-md">
+                    <span className="absolute top-3 left-3 text-2xl drop-shadow-sm">
                         {category.icon}
                     </span>
 
-                    <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-black/80 backdrop-blur-sm text-[10px] font-mono font-bold text-emerald-300 border border-emerald-500/30">
+                    <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-white/95 backdrop-blur-md text-[10px] font-mono font-bold text-emerald-800 border border-emerald-200/80 shadow-xs">
                         {spec}
                     </span>
                 </div>
 
                 <div className="pt-4 px-1">
-                    <h3 className="font-display text-base font-bold text-slate-900 group-hover:text-emerald-700 transition">
+                    <h3 className="font-display text-base font-bold text-slate-900 group-hover:text-brand-green transition">
                         {copy.name}
                     </h3>
                     <p className="mt-1.5 text-xs leading-relaxed text-slate-600 line-clamp-2">
@@ -142,7 +142,7 @@ export function CategoryCard({
                 </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-slate-100 px-1 flex items-center justify-between text-xs font-bold text-emerald-600">
+            <div className="mt-4 pt-3 border-t border-slate-100 px-1 flex items-center justify-between text-xs font-bold text-brand-green">
                 <span>Explore Technical Specs</span>
                 <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
             </div>

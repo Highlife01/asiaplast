@@ -69,10 +69,11 @@ export default async function KnowledgePage({ params }: { params: Promise<{ loca
     return (
         <>
             <JsonLd data={breadcrumbJsonLd([{ name: dict.nav.home, path: `/${l}` }, { name: dict.nav.knowledge, path: `/${l}/knowledge` }])} />
-            <section className="hero-bg py-16 text-white sm:py-20">
+            <section className="hero-bg border-b border-slate-200/80 py-16 text-slate-900 sm:py-20">
                 <div className="container-x">
-                    <h1 className="font-display text-4xl font-extrabold sm:text-5xl">{dict.nav.knowledge}</h1>
-                    <p className="mt-4 max-w-2xl text-slate-300">
+                    <p className="chip mb-3">Technical Guides</p>
+                    <h1 className="font-display text-4xl font-black text-slate-900 sm:text-5xl">{dict.nav.knowledge}</h1>
+                    <p className="mt-4 max-w-2xl text-slate-600 text-base sm:text-lg leading-relaxed">
                         Sourcing guides written for buyers, not consumers — technical, practical and export-focused.
                     </p>
                 </div>
@@ -81,10 +82,12 @@ export default async function KnowledgePage({ params }: { params: Promise<{ loca
             <section className="section">
                 <div className="container-x grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {ARTICLES.map((a) => (
-                        <article key={a.slug} className="card flex h-full flex-col p-6">
-                            <p className="font-mono text-[11px] uppercase tracking-widest text-slate-400">{a.readTime} read</p>
-                            <h2 className="mt-2 font-display text-base font-bold text-brand-navy">{a.title}</h2>
-                            <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{a.excerpt}</p>
+                        <article key={a.slug} className="card flex h-full flex-col p-7 hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-200">
+                            <span className="inline-block w-fit rounded-lg bg-slate-100 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                                {a.readTime} read
+                            </span>
+                            <h2 className="mt-3 font-display text-lg font-bold text-slate-900 leading-snug">{a.title}</h2>
+                            <p className="mt-2.5 flex-1 text-sm leading-relaxed text-slate-600">{a.excerpt}</p>
                         </article>
                     ))}
                 </div>

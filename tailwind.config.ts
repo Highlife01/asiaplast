@@ -6,17 +6,20 @@ const config: Config = {
         extend: {
             colors: {
                 brand: {
-                    navy: "#10243A",
-                    "navy-dark": "#0B1A2B",
-                    "navy-light": "#1B3A5C",
-                    green: "#19A974",
-                    "green-dark": "#128A5D",
-                    "green-light": "#E6F7F0"
+                    navy: "#0F172A",
+                    "navy-dark": "#020617",
+                    "navy-light": "#1E293B",
+                    green: "#059669",
+                    "green-dark": "#047857",
+                    "green-light": "#ECFDF5",
+                    teal: "#0D9488",
+                    cyan: "#0891B2"
                 },
                 surface: {
                     DEFAULT: "#FFFFFF",
-                    soft: "#F4F7FA",
-                    border: "#E3E9F0"
+                    soft: "#F8FAFC",
+                    subtle: "#F1F5F9",
+                    border: "#E2E8F0"
                 }
             },
             fontFamily: {
@@ -24,8 +27,11 @@ const config: Config = {
                 display: ["var(--font-manrope)", "var(--font-inter)", "system-ui", "sans-serif"]
             },
             boxShadow: {
-                card: "0 1px 2px rgba(16,36,58,.06), 0 8px 24px rgba(16,36,58,.08)",
-                cta: "0 8px 20px rgba(25,169,116,.35)"
+                xs: "0 1px 2px 0 rgba(0, 0, 0, 0.04)",
+                card: "0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 10px 25px -5px rgba(0, 0, 0, 0.04)",
+                "card-hover": "0 20px 35px -10px rgba(0, 0, 0, 0.08), 0 1px 3px 0 rgba(0, 0, 0, 0.05)",
+                cta: "0 10px 25px -5px rgba(5, 150, 105, 0.35)",
+                glass: "0 8px 32px 0 rgba(15, 23, 42, 0.06)"
             }
         }
     },

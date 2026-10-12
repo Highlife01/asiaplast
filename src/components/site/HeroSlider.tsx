@@ -226,11 +226,11 @@ export default function HeroSlider({ locale, labels }: Props) {
 
     return (
         <section
-            className="relative min-h-[92vh] flex flex-col justify-between overflow-hidden bg-slate-950 text-white select-none"
+            className="relative min-h-[92vh] flex flex-col justify-between overflow-hidden bg-slate-50 text-slate-900 select-none border-b border-slate-200/80"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
         >
-            {/* 4K Background Visual Showcase */}
+            {/* 4K Background Visual Showcase with Luminous Directional Scrim */}
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
                 {SLIDES.map((slide, idx) => {
                     const isCurrent = idx === current;
@@ -252,33 +252,39 @@ export default function HeroSlider({ locale, labels }: Props) {
                                     isCurrent ? "scale-105" : "scale-100"
                                 }`}
                             />
-                            {/* Professional industrial gradient: dark on left for typography readability, clear on right for 4K visuals */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/70 via-45% to-slate-950/15" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent via-60% to-slate-950/40" />
+                            {/* Directional light scrim: crystal clear photography with 100% typography contrast */}
+                            <div
+                                className={`absolute inset-0 bg-gradient-to-r ${
+                                    isRtl
+                                        ? "from-white/30 via-white/85 via-45% to-white/98"
+                                        : "from-white/98 via-white/85 via-45% to-white/30"
+                                }`}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-50 via-transparent via-55% to-white/60" />
                         </div>
                     );
                 })}
             </div>
 
             {/* Subtle Tech Grid Texture */}
-            <div className="hero-grid absolute inset-0 z-0 opacity-20 pointer-events-none" />
+            <div className="hero-grid absolute inset-0 z-0 opacity-40 pointer-events-none" />
 
             {/* Main Slide Content */}
-            <div className="container-x relative z-10 pt-20 sm:pt-28 pb-12 flex-1 flex flex-col justify-center">
+            <div className="container-x relative z-10 pt-16 sm:pt-24 pb-12 flex-1 flex flex-col justify-center">
                 <div className="max-w-3xl space-y-6">
                     {/* Badge / Pill */}
-                    <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-xs font-black tracking-widest uppercase shadow-lg shadow-emerald-950/40 backdrop-blur-md">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-black tracking-widest uppercase shadow-xs backdrop-blur-md">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                         <span>{tag}</span>
                     </div>
 
-                    {/* Dynamic Title with Gradient Text */}
-                    <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] text-white drop-shadow-md">
+                    {/* Dynamic Title */}
+                    <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] text-slate-900">
                         {title}
                     </h1>
 
                     {/* Subtitle */}
-                    <p className="text-base sm:text-lg text-slate-200 leading-relaxed max-w-2xl font-normal drop-shadow">
+                    <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl font-normal">
                         {subtitle}
                     </p>
 
@@ -287,9 +293,9 @@ export default function HeroSlider({ locale, labels }: Props) {
                         {highlights.map((h) => (
                             <span
                                 key={h}
-                                className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-xs font-semibold text-slate-200 backdrop-blur-md flex items-center gap-2 transition"
+                                className="px-3.5 py-1.5 rounded-xl bg-white/95 hover:bg-white border border-slate-200/90 text-xs font-semibold text-slate-700 shadow-xs backdrop-blur-md flex items-center gap-2 transition hover:border-emerald-300"
                             >
-                                <span className="text-emerald-400 font-bold">✓</span>
+                                <span className="text-emerald-600 font-bold">✓</span>
                                 {h}
                             </span>
                         ))}
@@ -299,7 +305,7 @@ export default function HeroSlider({ locale, labels }: Props) {
                     <div className="flex flex-wrap items-center gap-4 pt-4">
                         <Link
                             href={`${base}/quote`}
-                            className="px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-sm tracking-wide shadow-xl shadow-emerald-500/25 hover:shadow-cyan-500/30 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-2"
+                            className="px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm tracking-wide shadow-lg shadow-emerald-600/25 hover:shadow-xl hover:shadow-emerald-600/35 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-2"
                         >
                             <span>📦</span>
                             <span>{labels.ctaQuote}</span>
@@ -309,15 +315,15 @@ export default function HeroSlider({ locale, labels }: Props) {
                             href={`https://wa.me/905336840175?text=${whatsappPrefill}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-6 py-4 rounded-xl bg-[#25D366]/20 hover:bg-[#25D366]/30 border border-[#25D366]/60 text-emerald-300 font-bold text-sm backdrop-blur-md hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-2"
+                            className="px-6 py-4 rounded-xl bg-white hover:bg-emerald-50/80 border border-emerald-300 text-emerald-800 font-bold text-sm shadow-xs backdrop-blur-md hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-2"
                         >
-                            <span className="w-2.5 h-2.5 rounded-full bg-[#25D366] animate-pulse" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                             <span>WhatsApp: 0533 684 01 75</span>
                         </a>
 
                         <Link
                             href={`${base}/products`}
-                            className="px-6 py-4 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold text-sm backdrop-blur-md hover:border-slate-500 transition"
+                            className="px-6 py-4 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm shadow-xs backdrop-blur-md hover:border-slate-300 transition"
                         >
                             {labels.ctaProducts} &rarr;
                         </Link>
@@ -329,7 +335,7 @@ export default function HeroSlider({ locale, labels }: Props) {
                     <button
                         onClick={prevSlide}
                         aria-label="Previous Slide"
-                        className="w-12 h-12 rounded-full bg-slate-900/70 hover:bg-slate-800 border border-white/20 text-white grid place-items-center backdrop-blur-md transition hover:scale-110 active:scale-90"
+                        className="w-12 h-12 rounded-full bg-white/90 hover:bg-white border border-slate-200 text-slate-800 grid place-items-center shadow-md backdrop-blur-md transition hover:scale-110 active:scale-90"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
@@ -338,7 +344,7 @@ export default function HeroSlider({ locale, labels }: Props) {
                     <button
                         onClick={nextSlide}
                         aria-label="Next Slide"
-                        className="w-12 h-12 rounded-full bg-slate-900/70 hover:bg-slate-800 border border-white/20 text-white grid place-items-center backdrop-blur-md transition hover:scale-110 active:scale-90"
+                        className="w-12 h-12 rounded-full bg-white/90 hover:bg-white border border-slate-200 text-slate-800 grid place-items-center shadow-md backdrop-blur-md transition hover:scale-110 active:scale-90"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
@@ -348,7 +354,7 @@ export default function HeroSlider({ locale, labels }: Props) {
             </div>
 
             {/* Bottom Strip: 5 Slide Indicators with Titles & Progress Bar */}
-            <div className="relative z-10 border-t border-white/10 bg-slate-950/85 backdrop-blur-md py-4">
+            <div className="relative z-10 border-t border-slate-200/80 bg-white/85 backdrop-blur-xl py-4">
                 <div className="container-x">
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                         {SLIDES.map((slide, i) => {
@@ -358,29 +364,29 @@ export default function HeroSlider({ locale, labels }: Props) {
                                 <button
                                     key={slide.image}
                                     onClick={() => setCurrent(i)}
-                                    className={`relative text-left p-3 rounded-xl transition border ${
+                                    className={`relative text-left p-3.5 rounded-2xl transition border ${
                                         isActive
-                                            ? "bg-white/15 border-cyan-400/60 shadow-lg shadow-cyan-950/50"
-                                            : "bg-white/5 border-white/10 hover:bg-white/10 opacity-70 hover:opacity-100"
+                                            ? "bg-white border-emerald-500 shadow-md ring-2 ring-emerald-500/20"
+                                            : "bg-white/60 border-slate-200/80 hover:bg-white hover:border-slate-300 shadow-xs"
                                     }`}
                                 >
                                     <div className="flex items-center justify-between text-[10px] font-mono font-bold mb-1">
-                                        <span className={isActive ? "text-cyan-300" : "text-slate-400"}>
+                                        <span className={isActive ? "text-emerald-700 font-extrabold" : "text-slate-400"}>
                                             0{i + 1}
                                         </span>
                                         {isActive && (
-                                            <span className="text-emerald-400 font-sans text-[9px] uppercase tracking-wider font-extrabold">
+                                            <span className="text-emerald-600 font-sans text-[9px] uppercase tracking-wider font-extrabold">
                                                 Live
                                             </span>
                                         )}
                                     </div>
-                                    <p className="text-xs font-bold text-white line-clamp-1 leading-snug">
+                                    <p className={`text-xs font-bold line-clamp-1 leading-snug ${isActive ? "text-slate-900" : "text-slate-600"}`}>
                                         {slideTitle}
                                     </p>
 
                                     {/* Active Animated Progress Line */}
                                     {isActive && (
-                                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-cyan-400 to-teal-400 rounded-b-xl animate-pulse" />
+                                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-b-2xl animate-pulse" />
                                     )}
                                 </button>
                             );
@@ -390,11 +396,11 @@ export default function HeroSlider({ locale, labels }: Props) {
             </div>
 
             {/* Marquee Ticker */}
-            <div className="relative z-10 border-t border-white/10 bg-black/60 py-2.5 overflow-hidden" aria-hidden>
-                <div className="marquee flex w-max gap-8 font-mono text-[11px] uppercase tracking-[.25em] text-slate-400">
+            <div className="relative z-10 border-t border-slate-200/80 bg-slate-100/90 py-2.5 overflow-hidden" aria-hidden>
+                <div className="marquee flex w-max gap-8 font-mono text-[11px] uppercase tracking-[.25em] text-slate-500">
                     {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((kw, i) => (
                         <span key={`${kw}-${i}`} className="whitespace-nowrap flex items-center gap-4">
-                            <span className="text-emerald-400">&bull;</span>
+                            <span className="text-emerald-600 font-bold">&bull;</span>
                             {kw}
                         </span>
                     ))}

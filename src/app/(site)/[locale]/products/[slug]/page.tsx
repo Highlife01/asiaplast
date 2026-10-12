@@ -80,22 +80,22 @@ export default async function ProductDetailPage({ params }: Props) {
                 ])}
             />
 
-            <section className="hero-bg py-14 text-white">
+            <section className="hero-bg border-b border-slate-200/80 py-14 text-slate-900">
                 <div className="container-x">
-                    <nav className="text-xs text-slate-400" aria-label="Breadcrumb">
+                    <nav className="text-xs text-slate-500 font-medium" aria-label="Breadcrumb">
                         <Link href={localePath(l, "/")} className="hover:text-brand-green">{dict.nav.home}</Link>
                         <span className="mx-2">/</span>
                         <Link href={localePath(l, "/products")} className="hover:text-brand-green">{dict.nav.products}</Link>
                         <span className="mx-2">/</span>
-                        <span className="text-slate-200">{product.name}</span>
+                        <span className="text-slate-900 font-bold">{product.name}</span>
                     </nav>
-                    <h1 className="mt-4 max-w-3xl font-display text-3xl font-extrabold sm:text-4xl lg:text-5xl">
+                    <h1 className="mt-4 max-w-3xl font-display text-3xl font-black text-slate-900 sm:text-4xl lg:text-5xl">
                         {product.name}
                     </h1>
-                    <p className="mt-4 max-w-2xl text-slate-300">{product.shortDescription}</p>
+                    <p className="mt-4 max-w-2xl text-slate-600 text-base sm:text-lg leading-relaxed">{product.shortDescription}</p>
                     <div className="mt-6 flex flex-wrap gap-3">
-                        <a href="#quote" className="btn-primary">{dict.sections.productsRequest}</a>
-                        <a href="#specs" className="btn-outline-light">{dict.sections.specTitle}</a>
+                        <a href="#quote" className="btn-primary shadow-cta !px-6 !py-3">{dict.sections.productsRequest}</a>
+                        <a href="#specs" className="btn-outline-dark !px-6 !py-3">{dict.sections.specTitle}</a>
                     </div>
                 </div>
             </section>

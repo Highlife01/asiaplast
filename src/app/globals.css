@@ -29,31 +29,31 @@ body {
     }
 
     .btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green;
+        @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green;
     }
 
     .btn-primary {
-        @apply btn bg-brand-green text-white shadow-cta hover:bg-brand-green-dark active:translate-y-px;
+        @apply btn bg-gradient-to-r from-brand-green to-brand-teal text-white shadow-cta hover:from-brand-green-dark hover:to-brand-teal hover:shadow-lg active:scale-[0.98];
     }
 
     .btn-outline-light {
-        @apply btn border border-white/40 text-white hover:bg-white/10;
+        @apply btn border border-slate-200 bg-white/90 text-slate-800 shadow-sm hover:bg-white hover:border-slate-300;
     }
 
     .btn-outline-dark {
-        @apply btn border border-brand-navy/25 text-brand-navy hover:bg-brand-navy hover:text-white;
+        @apply btn border border-slate-300/80 bg-white text-slate-700 shadow-sm hover:border-slate-400 hover:text-slate-900 hover:bg-slate-50;
     }
 
     .card {
-        @apply rounded-2xl border border-surface-border bg-white shadow-card;
+        @apply rounded-3xl border border-surface-border bg-white shadow-card transition-all duration-300 hover:shadow-card-hover;
     }
 
     .input {
-        @apply w-full rounded-lg border border-surface-border bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/25;
+        @apply w-full rounded-xl border border-surface-border bg-white px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 transition-all focus:border-brand-green focus:outline-none focus:ring-4 focus:ring-brand-green/15;
     }
 
     .label {
-        @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500;
+        @apply mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500;
     }
 
     .section {
@@ -61,15 +61,15 @@ body {
     }
 
     .h2-title {
-        @apply font-display text-3xl font-bold tracking-tight text-brand-navy sm:text-4xl;
+        @apply font-display text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl;
     }
 
     .chip {
-        @apply inline-flex items-center rounded-full border border-brand-green/30 bg-brand-green-light px-3 py-1 text-xs font-semibold text-brand-green-dark;
+        @apply inline-flex items-center rounded-full border border-brand-green/30 bg-brand-green-light px-3.5 py-1 text-xs font-bold text-brand-green-dark shadow-sm;
     }
 
     .table-spec th {
-        @apply border-b border-surface-border bg-surface-soft px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-slate-500;
+        @apply border-b border-surface-border bg-surface-soft px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-slate-600;
     }
 
     .table-spec td {
@@ -77,18 +77,18 @@ body {
     }
 }
 
-/* Hero gradient + subtle mesh decoration */
+/* Radiant modern light hero gradient + subtle mesh decoration */
 .hero-bg {
     background:
-        radial-gradient(1200px 500px at 85% -10%, rgba(25, 169, 116, 0.28), transparent 60%),
-        radial-gradient(900px 420px at 15% 110%, rgba(6, 182, 212, 0.18), transparent 55%),
-        linear-gradient(135deg, #0b1a2b 0%, #10243a 55%, #16324f 100%);
+        radial-gradient(1100px 500px at 85% -10%, rgba(5, 150, 105, 0.08), transparent 60%),
+        radial-gradient(900px 450px at 15% 100%, rgba(8, 145, 178, 0.07), transparent 55%),
+        linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 55%, #F1F5F9 100%);
 }
 
 .hero-grid {
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+        linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
     background-size: 44px 44px;
     mask-image: radial-gradient(ellipse 90% 70% at 50% 35%, black 45%, transparent 100%);
 }

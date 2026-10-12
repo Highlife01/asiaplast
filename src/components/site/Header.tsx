@@ -45,13 +45,13 @@ export default function Header({
     };
 
     return (
-        <header className="sticky top-0 z-50 border-b border-white/10 bg-brand-navy/95 text-white backdrop-blur supports-[backdrop-filter]:bg-brand-navy/85">
-            <div className="container-x flex h-16 items-center justify-between gap-4">
-                <Link href={hrefFor(locale)} className="flex items-center gap-2.5" aria-label="ASIAPLAST home">
-                    <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-green font-display text-lg font-extrabold text-white">
+        <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 text-slate-800 backdrop-blur-xl supports-[backdrop-filter]:bg-white/80 shadow-xs transition-all duration-300">
+            <div className="container-x flex h-16 sm:h-20 items-center justify-between gap-4">
+                <Link href={hrefFor(locale)} className="flex items-center gap-3 group" aria-label="ASIAPLAST home">
+                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brand-green to-brand-teal font-display text-lg font-black text-white shadow-md shadow-brand-green/20 group-hover:scale-105 transition-transform duration-200">
                         A
                     </span>
-                    <span className="font-display text-xl font-extrabold tracking-wide">
+                    <span className="font-display text-xl sm:text-2xl font-black tracking-tight text-slate-900">
                         ASIA<span className="text-brand-green">PLAST</span>
                     </span>
                 </Link>
@@ -61,63 +61,72 @@ export default function Header({
                         <Link
                             key={item.sub || "home"}
                             href={hrefFor(locale, item.sub)}
-                            className={`rounded-md px-3 py-2 text-sm font-medium transition ${isActive(item) ? "bg-white/10 text-white" : "text-slate-200 hover:bg-white/5 hover:text-white"
-                                }`}
+                            className={`rounded-xl px-3.5 py-2 text-sm font-semibold transition-all duration-150 ${
+                                isActive(item)
+                                    ? "bg-brand-green-light text-brand-green-dark font-bold shadow-xs"
+                                    : "text-slate-600 hover:bg-slate-100/70 hover:text-slate-900"
+                            }`}
                         >
                             {item.label}
                         </Link>
                     ))}
                 </nav>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                     <div className="relative">
                         <button
                             type="button"
                             onClick={() => setLangOpen((v) => !v)}
-                            className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-slate-200 hover:bg-white/5 hover:text-white"
+                            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-xs hover:border-slate-300 hover:bg-slate-50 transition-all"
                             aria-haspopup="menu"
                             aria-expanded={langOpen}
                             aria-label={labels.language}
                         >
-                            <span aria-hidden>🌐</span>
-                            <span className="uppercase">{locale}</span>
+                            <span aria-hidden className="text-sm">🌐</span>
+                            <span className="uppercase tracking-wider">{locale}</span>
+                            <span className="text-[10px] text-slate-400">▼</span>
                         </button>
                         {langOpen && (
                             <div
-                                className="absolute end-0 top-full z-50 mt-2 max-h-96 w-56 overflow-auto rounded-xl border border-surface-border bg-white p-1.5 shadow-card"
+                                className="absolute end-0 top-full z-50 mt-2 max-h-96 w-60 overflow-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-card-hover animate-in fade-in zoom-in-95 duration-150"
                                 role="menu"
                             >
                                 {ACTIVE_LOCALES.map((l) => (
                                     <a
                                         key={l}
                                         href={hrefFor(l, cleanNeutral)}
-                                        className={`block rounded-lg px-3 py-2 text-sm ${l === locale ? "bg-brand-green-light font-semibold text-brand-green-dark" : "text-slate-700 hover:bg-surface-soft"
-                                            }`}
+                                        className={`flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-semibold transition ${
+                                            l === locale
+                                                ? "bg-brand-green-light font-bold text-brand-green-dark"
+                                                : "text-slate-700 hover:bg-surface-soft hover:text-slate-900"
+                                        }`}
                                         role="menuitem"
                                         hrefLang={l}
                                     >
-                                        {LOCALE_META[l].nativeName}
+                                        <span>{LOCALE_META[l].nativeName}</span>
+                                        <span className="font-mono text-[10px] uppercase text-slate-400">{l}</span>
                                     </a>
                                 ))}
-                                <div className="mt-1 border-t border-surface-border px-3 py-2 text-[11px] leading-snug text-slate-400">
+                                <div className="mt-1 border-t border-slate-100 px-3 py-2 text-[11px] font-medium leading-snug text-slate-400">
                                     + 25 more languages rolling out
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    <Link href={hrefFor(locale, "/quote")} className="btn-primary hidden !py-2 sm:inline-flex">
-                        {cta}
+                    <Link href={hrefFor(locale, "/quote")} className="btn-primary hidden !py-2.5 !px-5 text-xs sm:inline-flex">
+                        <span>📋</span>
+                        <span>{cta}</span>
                     </Link>
 
                     <button
                         type="button"
-                        className="grid h-10 w-10 place-items-center rounded-md text-slate-200 hover:bg-white/5 lg:hidden"
+                        className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 lg:hidden transition"
                         onClick={() => setOpen((v) => !v)}
                         aria-label="Toggle menu"
                         aria-expanded={open}
                     >
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
                             {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
                         </svg>
                     </button>
@@ -125,19 +134,26 @@ export default function Header({
             </div>
 
             {open && (
-                <nav className="border-t border-white/10 bg-brand-navy px-4 pb-4 pt-2 lg:hidden" aria-label="Mobile">
-                    {nav.map((item) => (
-                        <Link
-                            key={item.sub || "home"}
-                            href={hrefFor(locale, item.sub)}
-                            onClick={() => setOpen(false)}
-                            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5 hover:text-white"
-                        >
-                            {item.label}
-                        </Link>
-                    ))}
-                    <Link href={hrefFor(locale, "/quote")} onClick={() => setOpen(false)} className="btn-primary mt-3 w-full">
-                        {cta}
+                <nav className="border-t border-slate-200/80 bg-white/95 backdrop-blur-md px-4 pb-5 pt-3 lg:hidden animate-in slide-in-from-top-2 duration-150" aria-label="Mobile">
+                    <div className="space-y-1">
+                        {nav.map((item) => (
+                            <Link
+                                key={item.sub || "home"}
+                                href={hrefFor(locale, item.sub)}
+                                onClick={() => setOpen(false)}
+                                className={`block rounded-xl px-3.5 py-2.5 text-sm font-semibold transition ${
+                                    isActive(item)
+                                        ? "bg-brand-green-light text-brand-green-dark font-bold"
+                                        : "text-slate-700 hover:bg-slate-100"
+                                }`}
+                            >
+                                {item.label}
+                            </Link>
+                        ))}
+                    </div>
+                    <Link href={hrefFor(locale, "/quote")} onClick={() => setOpen(false)} className="btn-primary mt-4 w-full justify-center">
+                        <span>📋</span>
+                        <span>{cta}</span>
                     </Link>
                 </nav>
             )}

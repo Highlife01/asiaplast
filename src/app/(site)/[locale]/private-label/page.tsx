@@ -28,28 +28,31 @@ export default async function PrivateLabelPage({ params }: { params: Promise<{ l
     return (
         <>
             <JsonLd data={breadcrumbJsonLd([{ name: dict.nav.home, path: localePath(l, "/") }, { name: copy.title, path: localePath(l, "/private-label") }])} />
-            <section className="hero-bg py-16 text-white sm:py-20">
+            <section className="hero-bg border-b border-slate-200/80 py-16 text-slate-900 sm:py-20">
                 <div className="container-x">
-                    <h1 className="font-display text-4xl font-extrabold sm:text-5xl">{copy.title}</h1>
-                    <p className="mt-4 max-w-2xl text-slate-300">{copy.lead}</p>
+                    <p className="chip mb-3">OEM & Custom Packaging</p>
+                    <h1 className="font-display text-4xl font-black text-slate-900 sm:text-5xl">{copy.title}</h1>
+                    <p className="mt-4 max-w-2xl text-slate-600 text-base sm:text-lg leading-relaxed">{copy.lead}</p>
                 </div>
             </section>
             <section className="section">
                 <div className="container-x space-y-10">
-                    <div className="max-w-3xl space-y-4 text-slate-600 leading-relaxed">
+                    <div className="max-w-3xl space-y-4 text-slate-600 leading-relaxed text-base">
                         {copy.paragraphs.map((p) => (
                             <p key={p}>{p}</p>
                         ))}
                     </div>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         {copy.items.map((item) => (
-                            <div key={item.title} className="card p-5">
-                                <h3 className="font-display font-bold text-brand-navy">{item.title}</h3>
-                                <p className="mt-2 text-sm text-slate-600">{item.text}</p>
+                            <div key={item.title} className="card p-6 hover:border-emerald-500/40 hover:-translate-y-0.5 transition-all duration-200">
+                                <h3 className="font-display font-bold text-slate-900 text-base">{item.title}</h3>
+                                <p className="mt-2 text-sm text-slate-600 leading-relaxed">{item.text}</p>
                             </div>
                         ))}
                     </div>
-                    <Link href={localePath(l, "/quote")} className="btn-primary">{dict.site.ctaQuote}</Link>
+                    <div>
+                        <Link href={localePath(l, "/quote")} className="btn-primary shadow-cta !px-8 !py-4">{dict.site.ctaQuote}</Link>
+                    </div>
                 </div>
             </section>
         </>

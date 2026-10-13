@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
 import WhatsAppButton from "@/components/site/WhatsAppButton";
+import AnalyticsConsent from "@/components/site/AnalyticsConsent";
+import VisitorTracker from "@/components/site/VisitorTracker";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { ACTIVE_LOCALES, isLocale, type Locale } from "@/lib/i18n/locales";
 
@@ -25,6 +28,9 @@ export default async function LocaleLayout({
 
     return (
         <>
+            <Suspense fallback={null}>
+                <VisitorTracker />
+            </Suspense>
             <Header locale={locale} labels={{ nav: dict.nav, language: dict.site.language }} cta={dict.site.ctaQuote} />
             <main id="main">{children}</main>
             <Footer
@@ -45,6 +51,7 @@ export default async function LocaleLayout({
                 }}
             />
             <WhatsAppButton locale={locale} />
+            <AnalyticsConsent locale={locale} />
         </>
     );
 }

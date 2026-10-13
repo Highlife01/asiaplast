@@ -63,5 +63,7 @@ export const COLLECTIONS = {
     translations: "translations",
     seoSettings: "seoSettings",
     mediaAssets: "mediaAssets",
-    auditLogs: "auditLogs"
+    auditLogs: "auditLogs",
+    visitorSessions: "visitorSessions",
+    loginLogs: "loginLogs"
 } as const;

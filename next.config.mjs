@@ -3,7 +3,9 @@ const nextConfig = {
     reactStrictMode: true,
     poweredByHeader: false,
     images: {
-        formats: ["image/avif", "image/webp"],
+        formats: ["image/webp"],
+        deviceSizes: [640, 828, 1080, 1280, 1600],
+        imageSizes: [128, 256, 384],
         minimumCacheTTL: 31536000,
         remotePatterns: [
             { protocol: "https", hostname: "firebasestorage.googleapis.com" },

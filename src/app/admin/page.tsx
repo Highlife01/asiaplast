@@ -7,6 +7,21 @@ import AdminDashboardClient from "./AdminDashboardClient";
 
 export const dynamic = "force-dynamic";
 
+function serializeForClient<T>(data: T): T {
+    if (!data) return data;
+    return JSON.parse(
+        JSON.stringify(data, (_, val) => {
+            if (val && typeof val === "object" && typeof val.toDate === "function") {
+                return val.toDate().toISOString();
+            }
+            if (val && typeof val === "object" && typeof val._seconds === "number") {
+                return new Date(val._seconds * 1000).toISOString();
+            }
+            return val;
+        })
+    );
+}
+
 export default async function AdminDashboardPage() {
     const session = await getSession();
 
@@ -57,10 +72,10 @@ export default async function AdminDashboardPage() {
 
     return (
         <AdminDashboardClient
-            initialQuotes={quotes}
-            initialMessages={messages}
-            initialAnalytics={initialAnalytics}
-            initialLogins={initialLogins}
+            initialQuotes={serializeForClient(quotes)}
+            initialMessages={serializeForClient(messages)}
+            initialAnalytics={serializeForClient(initialAnalytics)}
+            initialLogins={serializeForClient(initialLogins)}
             initialError={initialError}
             operatorEmail={session.email}
             operatorRole={session.roles.includes("superadmin") ? "superadmin" : "admin"}

@@ -35,7 +35,11 @@ export default async function FaqPage({ params }: { params: Promise<{ locale: st
             <JsonLd data={breadcrumbJsonLd([{ name: dict.nav.home, path: localePath(l, "/") }, { name: dict.sections.faqTitle, path: localePath(l, "/faq") }])} />
             <section className="hero-bg border-b border-slate-200/80 py-16 text-slate-900 sm:py-20">
                 <div className="container-x">
-                    <p className="chip mb-3">Knowledge Base</p>
+                    <p className="chip mb-3">
+                        <Link href={localePath(l, "/knowledge")} className="hover:underline">
+                            {dict.nav.knowledge}
+                        </Link>
+                    </p>
                     <h1 className="font-display text-4xl font-black text-slate-900 sm:text-5xl">{dict.sections.faqTitle}</h1>
                 </div>
             </section>

@@ -17,7 +17,7 @@ export default function VisitorTracker() {
 
     function isTrackingAllowed(): boolean {
         const consent = getCookie("ap_analytics_consent");
-        return consent !== "denied";
+        return consent === "granted";
     }
 
     function sendTrackingEvent(path: string) {

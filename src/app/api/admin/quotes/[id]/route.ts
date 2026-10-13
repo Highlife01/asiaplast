@@ -3,6 +3,7 @@ import { requireSession } from "@/lib/session";
 import { updateQuoteStatus, logAudit } from "@/lib/repo";
 import { db, COLLECTIONS } from "@/lib/firebaseAdmin";
 import type { MessageStatus } from "@/lib/config";
+import { unauthorizedResponse, invalidStatusResponse, rejectCrossOrigin } from "@/lib/adminGuard";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,6 +12,8 @@ export async function PATCH(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    const blocked = rejectCrossOrigin(request);
+    if (blocked) return blocked;
     try {
         const session = await requireSession();
         const { id } = await params;
@@ -25,6 +28,8 @@ export async function PATCH(
 
         return NextResponse.json({ ok: true, id, status: body.status });
     } catch (err) {
+        const res = unauthorizedResponse(err) || invalidStatusResponse(err);
+        if (res) return res;
         console.error("[quote-update] error:", err);
         return NextResponse.json({ error: "Failed to update quote request" }, { status: 500 });
     }
@@ -34,6 +39,8 @@ export async function DELETE(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    const blocked = rejectCrossOrigin(request);
+    if (blocked) return blocked;
     try {
         const session = await requireSession();
         const { id } = await params;
@@ -43,6 +50,8 @@ export async function DELETE(
 
         return NextResponse.json({ ok: true, id });
     } catch (err) {
+        const res = unauthorizedResponse(err);
+        if (res) return res;
         console.error("[quote-delete] error:", err);
         return NextResponse.json({ error: "Failed to delete quote" }, { status: 500 });
     }

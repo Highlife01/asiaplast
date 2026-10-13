@@ -47,6 +47,8 @@ export default function Footer({ locale, labels }: { locale: Locale; labels: Rec
                         <li><Link href={localePath(locale, "/about")} className="text-slate-600 hover:text-brand-green transition-colors">{labels.about}</Link></li>
                         <li><Link href={localePath(locale, "/export")} className="text-slate-600 hover:text-brand-green transition-colors">{labels.export}</Link></li>
                         <li><Link href={localePath(locale, "/private-label")} className="text-slate-600 hover:text-brand-green transition-colors">{labels.privateLabel}</Link></li>
+                        <li><Link href={localePath(locale, "/knowledge")} className="text-slate-600 hover:text-brand-green transition-colors">{labels.knowledge}</Link></li>
+                        <li><Link href={localePath(locale, "/faq")} className="text-slate-600 hover:text-brand-green transition-colors">{labels.faq}</Link></li>
                         <li><Link href={localePath(locale, "/contact")} className="text-slate-600 hover:text-brand-green transition-colors">{labels.contactUs}</Link></li>
                     </ul>
                 </div>

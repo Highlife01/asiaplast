@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { SEED_PRODUCTS } from "@/data/catalog";
+import { getKnowledgeArticles } from "@/data/knowledge";
 import { SITE_URL } from "@/lib/config";
 import { ACTIVE_LOCALES } from "@/lib/i18n/locales";
 import { getProducts } from "@/lib/repo";
@@ -13,6 +14,7 @@ const STATIC_PATHS = [
     { path: "/private-label", priority: 0.8, changeFrequency: "monthly" as const },
     { path: "/quote", priority: 0.8, changeFrequency: "monthly" as const },
     { path: "/contact", priority: 0.8, changeFrequency: "monthly" as const },
+    { path: "/knowledge", priority: 0.7, changeFrequency: "monthly" as const },
     { path: "/faq", priority: 0.6, changeFrequency: "monthly" as const },
     { path: "/privacy", priority: 0.2, changeFrequency: "yearly" as const },
     { path: "/terms", priority: 0.2, changeFrequency: "yearly" as const }
@@ -49,6 +51,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 lastModified: now,
                 changeFrequency: "weekly",
                 priority: 0.8
+            });
+        }
+    }
+
+    for (const article of getKnowledgeArticles()) {
+        for (const locale of ACTIVE_LOCALES) {
+            entries.push({
+                url: `${SITE_URL}${localePath(locale, `/knowledge/${article.slug}`)}`,
+                lastModified: now,
+                changeFrequency: "monthly",
+                priority: 0.65
             });
         }
     }

@@ -7,14 +7,23 @@ import { getClientIp } from "@/lib/session";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+/** Keep only a handful of short string values from the client-supplied utm object. */
+function sanitizeUtm(raw: unknown): Record<string, string> | undefined {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return undefined;
+    const out: Record<string, string> = {};
+    for (const [key, value] of Object.entries(raw as Record<string, unknown>).slice(0, 10)) {
+        if (typeof value === "string") out[key.slice(0, 40)] = value.slice(0, 120);
+    }
+    return Object.keys(out).length ? out : undefined;
+}
+
 export async function POST(request: Request) {
     try {
         const cookieStore = await cookies();
         const consent = cookieStore.get("ap_analytics_consent")?.value;
 
-        // If visitor explicitly denied consent, skip non-essential tracking
-        if (consent === "denied") {
-            return NextResponse.json({ ok: false, reason: "CONSENT_DENIED" }, { status: 200 });
+        if (consent !== "granted") {
+            return NextResponse.json({ ok: false, reason: "CONSENT_REQUIRED" }, { status: 200 });
         }
 
         let sessionId = cookieStore.get("ap_visitor_session")?.value;
@@ -34,7 +43,7 @@ export async function POST(request: Request) {
             path: typeof body.path === "string" ? body.path.slice(0, 200) : "/",
             title: typeof body.title === "string" ? body.title.slice(0, 200) : "",
             referrer: typeof body.referrer === "string" ? body.referrer.slice(0, 300) : undefined,
-            utm: body.utm && typeof body.utm === "object" ? body.utm : undefined,
+            utm: sanitizeUtm(body.utm),
             screenResolution: typeof body.screenResolution === "string" ? body.screenResolution.slice(0, 30) : undefined,
             browserLanguage: typeof body.browserLanguage === "string" ? body.browserLanguage.slice(0, 30) : undefined,
             userAgent,

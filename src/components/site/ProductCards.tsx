@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { CATEGORIES, type SeedProduct } from "@/data/catalog";
 import { getCategoryCopy } from "@/lib/i18n/content";
 import type { Locale } from "@/lib/i18n/locales";
@@ -46,11 +47,12 @@ export function ProductCard({
             <div>
                 {/* Product 4K Image Container with Zoom Effect */}
                 <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-100">
-                    <img
+                    <Image
                         src={imageUrl}
                         alt={product.name}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                        fill
+                        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/25 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
 
@@ -137,11 +139,12 @@ export function CategoryCard({
             <div>
                 {/* 4K Photographic Visual */}
                 <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-100">
-                    <img
+                    <Image
                         src={imageUrl}
                         alt={copy.name}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                        fill
+                        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
 

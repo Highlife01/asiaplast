@@ -42,6 +42,8 @@ export default async function LocaleLayout({
                     about: dict.nav.about,
                     export: dict.nav.export,
                     privateLabel: dict.nav.privateLabel,
+                    knowledge: dict.nav.knowledge,
+                    faq: dict.nav.faq,
                     contactUs: dict.footer.contactUs,
                     language: dict.site.language,
                     rights: dict.footer.rights,

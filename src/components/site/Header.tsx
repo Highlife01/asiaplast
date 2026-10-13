@@ -27,7 +27,7 @@ export default function Header({
         { sub: "/about", label: labels.nav.about },
         { sub: "/export", label: labels.nav.export },
         { sub: "/private-label", label: labels.nav.privateLabel },
-        { sub: "/faq", label: labels.nav.faq || labels.nav.knowledge },
+        { sub: "/knowledge", label: labels.nav.knowledge },
         { sub: "/contact", label: labels.nav.contact }
     ];
 

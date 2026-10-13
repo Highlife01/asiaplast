@@ -5,6 +5,12 @@ import { queryAnalyticsReport, type AnalyticsFilter } from "@/lib/analytics";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+function clampInt(raw: string | null, fallback: number, min: number, max: number): number {
+    const n = parseInt(raw || "", 10);
+    if (!Number.isFinite(n)) return fallback;
+    return Math.min(max, Math.max(min, n));
+}
+
 export async function GET(request: Request) {
     try {
         await requireSession();
@@ -17,8 +23,8 @@ export async function GET(request: Request) {
             browser: searchParams.get("browser") || undefined,
             conversionStatus: (searchParams.get("conversionStatus") as AnalyticsFilter["conversionStatus"]) || "all",
             includeBots: searchParams.get("includeBots") === "true",
-            page: parseInt(searchParams.get("page") || "1", 10),
-            pageSize: parseInt(searchParams.get("pageSize") || "20", 10)
+            page: clampInt(searchParams.get("page"), 1, 1, 10_000),
+            pageSize: clampInt(searchParams.get("pageSize"), 20, 1, 200)
         };
 
         const isCsvExport = searchParams.get("export") === "csv";

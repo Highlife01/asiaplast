@@ -1,4 +1,4 @@
-const CACHE_NAME = "asiaplast-v1";
+const CACHE_NAME = "asiaplast-v2";
 const OFFLINE_URL = "/offline.html";
 
 const PRECACHE_ASSETS = [

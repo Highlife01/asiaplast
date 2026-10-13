@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { quoteSchema, looksLikeSpam } from "@/lib/validation";
 import { createQuoteRequest } from "@/lib/repo";
-import { rateLimit } from "@/lib/rateLimit";
+import { rateLimitShared } from "@/lib/rateLimit";
 import { getClientIp } from "@/lib/session";
 import { RATE_LIMITS } from "@/lib/config";
 import { productLabelFor } from "@/lib/catalog";
@@ -14,30 +14,30 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
     try {
         const ip = await getClientIp();
-        const burst = rateLimit(`quote:${ip}`, 3, RATE_LIMITS.quoteMs);
+        const burst = await rateLimitShared(`quote:${ip}`, 3, RATE_LIMITS.quoteMs);
         if (!burst.allowed) {
             return NextResponse.json(
-                { error: "Çok fazla istek gönderildi. Lütfen bekleyin.", code: "RATE_LIMITED" },
+                { error: "Ã‡ok fazla istek gÃ¶nderildi. LÃ¼tfen bekleyin.", code: "RATE_LIMITED" },
                 { status: 429, headers: { "Retry-After": String(burst.retryAfterSeconds) } }
             );
         }
-        const hourly = rateLimit(`quote-hour:${ip}`, RATE_LIMITS.hourlyMax, 3600_000);
+        const hourly = await rateLimitShared(`quote-hour:${ip}`, RATE_LIMITS.hourlyMax, 3600_000);
         if (!hourly.allowed) {
             return NextResponse.json(
-                { error: "Saatlik istek sınırı aşıldı. Lütfen daha sonra deneyin.", code: "RATE_LIMITED" },
+                { error: "Saatlik istek sÄ±nÄ±rÄ± aÅŸÄ±ldÄ±. LÃ¼tfen daha sonra deneyin.", code: "RATE_LIMITED" },
                 { status: 429, headers: { "Retry-After": String(hourly.retryAfterSeconds) } }
             );
         }
 
         const body = await request.json().catch(() => null);
         if (!body) {
-            return NextResponse.json({ error: "Geçersiz istek gövdesi (Invalid JSON)" }, { status: 400 });
+            return NextResponse.json({ error: "GeÃ§ersiz istek gÃ¶vdesi (Invalid JSON)" }, { status: 400 });
         }
 
         const parsed = quoteSchema.safeParse(body);
         if (!parsed.success) {
             return NextResponse.json(
-                { error: "Doğrulama başarısız oldu. Lütfen zorunlu alanları kontrol edin.", issues: parsed.error.flatten().fieldErrors },
+                { error: "DoÄŸrulama baÅŸarÄ±sÄ±z oldu. LÃ¼tfen zorunlu alanlarÄ± kontrol edin.", issues: parsed.error.flatten().fieldErrors },
                 { status: 400 }
             );
         }
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
         const text = `${parsed.data.message || ""} ${parsed.data.volume}`;
         if (looksLikeSpam(text) || looksLikeSpam(parsed.data.name)) {
             return NextResponse.json(
-                { error: "Talebiniz güvenlik/spam filtresine takıldı. Lütfen içeriği kontrol edin." },
+                { error: "Talebiniz gÃ¼venlik/spam filtresine takÄ±ldÄ±. LÃ¼tfen iÃ§eriÄŸi kontrol edin." },
                 { status: 400 }
             );
         }
@@ -68,6 +68,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ ok: true, id }, { status: 201 });
     } catch (err) {
         console.error("[quotes] submission failed:", err);
-        return NextResponse.json({ error: "Sunucu veritabanı kayıt hatası. Lütfen daha sonra tekrar deneyin." }, { status: 500 });
+        return NextResponse.json({ error: "Sunucu veritabanÄ± kayÄ±t hatasÄ±. LÃ¼tfen daha sonra tekrar deneyin." }, { status: 500 });
     }
 }

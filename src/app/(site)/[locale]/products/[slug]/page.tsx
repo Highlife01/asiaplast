@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/site/JsonLd";
 import QuoteForm from "@/components/site/QuoteForm";
@@ -169,7 +170,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
     return (
         <>
-            <JsonLd data={productJsonLd({ name: product.name, description: product.shortDescription, slug: product.slug })} />
+            <JsonLd data={productJsonLd({ name: product.name, description: product.shortDescription, slug: product.slug, locale: l })} />
             <JsonLd
                 data={breadcrumbJsonLd([
                     { name: dict.nav.home, path: localePath(l, "/") },
@@ -203,10 +204,13 @@ export default async function ProductDetailPage({ params }: Props) {
                     <div>
                         {/* 4K Product Showcase Image */}
                         <div className="relative aspect-[16/10] w-full overflow-hidden rounded-3xl border border-slate-200/90 shadow-xl mb-8 bg-slate-100">
-                            <img
+                            <Image
                                 src={categoryImage}
                                 alt={product.name}
-                                className="w-full h-full object-cover"
+                                fill
+                                priority
+                                sizes="(min-width: 1024px) 60vw, 100vw"
+                                className="object-cover"
                             />
                             <div className="absolute bottom-4 left-4 flex flex-wrap gap-2">
                                 <span className="px-3 py-1 rounded-full bg-slate-950/85 backdrop-blur-md text-xs font-bold text-emerald-300 border border-emerald-500/30 shadow-lg">

@@ -102,7 +102,8 @@ export function organizationJsonLd() {
     };
 }
 
-export function productJsonLd(p: { name: string; description: string; slug: string }) {
+export function productJsonLd(p: { name: string; description: string; slug: string; locale?: Locale }) {
+    const locale = p.locale ?? DEFAULT_LOCALE;
     return {
         "@context": "https://schema.org",
         "@type": "Product",
@@ -110,7 +111,7 @@ export function productJsonLd(p: { name: string; description: string; slug: stri
         description: p.description,
         category: "Garbage Bags",
         brand: { "@type": "Brand", name: "ASIAPLAST" },
-        url: absoluteUrl(localePath("en", `/products/${p.slug}`))
+        url: absoluteUrl(localePath(locale, `/products/${localizedSlug(p.slug, locale)}`))
         // No Offer markup: B2B quotation-based sales (prices on request).
     };
 }
@@ -125,6 +126,20 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
             name: it.name,
             item: absoluteUrl(it.path)
         }))
+    };
+}
+
+export function articleJsonLd(a: { title: string; description: string; slug: string; dateModified?: string; locale?: Locale }) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: a.title,
+        description: a.description,
+        dateModified: a.dateModified,
+        inLanguage: LOCALE_META[a.locale ?? DEFAULT_LOCALE].hreflang,
+        author: { "@type": "Organization", name: "ASIAPLAST" },
+        publisher: { "@type": "Organization", name: "ASIAPLAST" },
+        url: absoluteUrl(localePath(a.locale ?? DEFAULT_LOCALE, `/knowledge/${a.slug}`))
     };
 }
 

@@ -24,10 +24,9 @@ export type SessionPayload = {
     jti: string;
 };
 
-function getSecret(): string {
-    const secret =
-        process.env.ADMIN_SESSION_SECRET ||
-        "asiaplast_production_superadmin_session_hmac_secret_2026_x89a1bc";
+function getSecret(): string | null {
+    const secret = (process.env.ADMIN_SESSION_SECRET || "").trim();
+    if (secret.length < 32) return null;
     return secret;
 }
 
@@ -35,11 +34,15 @@ function b64url(input: Buffer | string): string {
     return Buffer.from(input).toString("base64url");
 }
 
-function sign(data: string): string {
-    return createHmac("sha256", getSecret()).update(data).digest("base64url");
+function sign(data: string, secret: string): string {
+    return createHmac("sha256", secret).update(data).digest("base64url");
 }
 
 export function createSessionToken(payload: Omit<SessionPayload, "iat" | "exp" | "jti">): string {
+    const secret = getSecret();
+    if (!secret) {
+        throw new Error("ADMIN_SESSION_SECRET is missing or shorter than 32 characters");
+    }
     const now = Math.floor(Date.now() / 1000);
     const ttlHours = Number(ADMIN_SESSION_TTL_HOURS || 12);
     const full: SessionPayload = {
@@ -49,16 +52,18 @@ export function createSessionToken(payload: Omit<SessionPayload, "iat" | "exp" |
         jti: randomUUID()
     };
     const body = b64url(JSON.stringify(full));
-    return `${body}.${sign(body)}`;
+    return `${body}.${sign(body, secret)}`;
 }
 
 export function verifySessionToken(token: string | undefined | null): SessionPayload | null {
     if (!token) return null;
+    const secret = getSecret();
+    if (!secret) return null;
     const idx = token.lastIndexOf(".");
     if (idx <= 0) return null;
     const body = token.slice(0, idx);
     const mac = token.slice(idx + 1);
-    const expected = sign(body);
+    const expected = sign(body, secret);
     const a = Buffer.from(mac);
     const b = Buffer.from(expected);
     if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
@@ -95,9 +100,15 @@ export function sessionCookieOptions(maxAgeSeconds: number) {
     };
 }
 
-/** Client IP for rate limiting — derived from proxy headers, server-side only. */
+/**
+ * Client IP for rate limiting — derived from proxy headers, server-side only.
+ * Firebase Hosting's CDN sets `fastly-client-ip` itself, so it cannot be spoofed by the client
+ * (unlike the left-most x-forwarded-for entry, which the client may prepend).
+ */
 export async function getClientIp(): Promise<string> {
     const h = await headers();
+    const trusted = h.get("fastly-client-ip");
+    if (trusted) return trusted.trim();
     const fwd = h.get("x-forwarded-for");
     if (fwd) return fwd.split(",")[0].trim();
     return h.get("x-real-ip") || "unknown";

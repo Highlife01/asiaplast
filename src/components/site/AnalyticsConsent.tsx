@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { type Locale } from "@/lib/i18n/locales";
+import { localePath } from "@/lib/seo";
 
 type Props = {
     locale?: Locale;
@@ -10,35 +11,35 @@ type Props = {
 const CONSENT_TEXTS: Record<string, { title: string; text: string; accept: string; decline: string; privacy: string }> = {
     tr: {
         title: "Gizlilik ve Analitik Tercihleri",
-        text: "Sitemizde ziyaretçi deneyimini analiz etmek için birinci taraf analitik çerezleri kullanılmaktadır. Cihaz parmak izi veya kişisel veri toplanmaz.",
+        text: "Analitik çerezleri yalnızca Kabul Et derseniz çalışır. Reddederseniz veya seçim yapmazsanız sayfa görüntülemelerini kaydetmeyiz. Cihaz parmak izi alınmaz.",
         accept: "Kabul Et",
         decline: "Reddet",
         privacy: "Gizlilik Politikası"
     },
     en: {
         title: "Privacy & Analytics Preferences",
-        text: "We use first-party analytics cookies to measure site engagement and export inquiries. We do not perform device fingerprinting or store personal data without consent.",
+        text: "Analytics cookies run only after you click Accept. If you decline or make no choice, we do not record page views. We do not fingerprint devices.",
         accept: "Accept",
         decline: "Decline",
         privacy: "Privacy Policy"
     },
     de: {
         title: "Datenschutz- und Analyseeinstellungen",
-        text: "Wir verwenden First-Party-Analyse-Cookies, um die Nutzung unserer Website zu verstehen. Es werden keine Fingerabdrücke erstellt.",
+        text: "Analyse-Cookies laufen erst nach Ihrer Zustimmung. Ohne Auswahl oder bei Ablehnung erfassen wir keine Seitenaufrufe. Es erfolgt kein Fingerprinting.",
         accept: "Akzeptieren",
         decline: "Ablehnen",
         privacy: "Datenschutzerklärung"
     },
     fr: {
         title: "Préférences de Confidentialité & Analytique",
-        text: "Nous utilisons des cookies analytiques de première partie pour analyser la fréquentation. Aucune empreinte d'appareil n'est collectée.",
+        text: "Les cookies analytiques ne s'activent qu'après votre acceptation. Sans choix ou en cas de refus, nous n'enregistrons aucune page vue. Pas d'empreinte d'appareil.",
         accept: "Accepter",
         decline: "Refuser",
         privacy: "Politique de Confidentialité"
     },
     ar: {
         title: "تفضيلات الخصوصية والتحليلات",
-        text: "نستخدم ملفات تعريف الارتباط للطرف الأول لتحليل تجربة التصفح. لا نجمع أي بيانات تعريف شخصية أو بصمة للجهاز.",
+        text: "تعمل ملفات التحليلات فقط بعد الموافقة. إذا رفضت أو لم تختر، لا نسجّل مشاهدات الصفحات. لا نأخذ بصمة للجهاز.",
         accept: "موافق",
         decline: "رفض",
         privacy: "سياسة الخصوصية"
@@ -109,7 +110,7 @@ export default function AnalyticsConsent({ locale = "en" }: Props) {
                             {content.decline}
                         </button>
                         <a
-                            href={`/${locale}/privacy`}
+                            href={localePath(locale, "/privacy")}
                             className="text-[11px] text-cyan-400 hover:underline ml-auto"
                         >
                             {content.privacy}

@@ -6,11 +6,11 @@ loadLocalEnv();
 async function main() {
     const email = process.argv[2];
     if (!email) {
-        console.error("Usage: npm run admin:set -- user@example.com");
+        console.error("Usage: npm run admin:set -- user@example.com [--super]");
         process.exit(1);
     }
     const user = await adminAuth().getUserByEmail(email);
-    const isSuper = email === "cebrailkara@gmail.com" || process.argv.includes("--super");
+    const isSuper = process.argv.includes("--super");
     await adminAuth().setCustomUserClaims(user.uid, {
         admin: true,
         superadmin: isSuper,

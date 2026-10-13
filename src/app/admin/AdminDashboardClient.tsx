@@ -231,7 +231,7 @@ export default function AdminDashboardClient({
                             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                             Gerçek Firestore Senkronizasyonu
                         </span>
-                        {operatorRole === "superadmin" || operatorEmail === "cebrailkara@gmail.com" ? (
+                        {operatorRole === "superadmin" ? (
                             <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-amber-300 font-bold bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/30">
                                 👑 SÜPER YÖNETİCİ &bull; {operatorEmail}
                             </span>

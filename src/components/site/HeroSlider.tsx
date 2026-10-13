@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import type { Locale } from "@/lib/i18n/locales";
 import { localePath } from "@/lib/seo";
 
@@ -243,12 +244,14 @@ export default function HeroSlider({ locale, labels }: Props) {
                                 isCurrent ? "opacity-100" : "opacity-0"
                             }`}
                         >
-                            <img
+                            <Image
                                 src={slide.image}
                                 alt={slideTitle}
-                                fetchPriority={idx === 0 ? "high" : "auto"}
-                                loading={idx === 0 ? "eager" : "lazy"}
-                                className={`absolute inset-0 w-full h-full object-cover object-center transform transition-transform duration-[8000ms] ${
+                                fill
+                                sizes="100vw"
+                                quality={75}
+                                priority={idx === 0}
+                                className={`object-cover object-center transform transition-transform duration-[8000ms] ${
                                     isCurrent ? "scale-105" : "scale-100"
                                 }`}
                             />

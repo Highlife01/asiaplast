@@ -5,7 +5,9 @@
         "ignore": [
             "firebase.json",
             "**/.*",
-            "**/node_modules/**"
+            "**/node_modules/**",
+            "asiaplast_global_portal_real_time_management_dashboard.html",
+            "README.md"
         ],
         "frameworksBackend": {
             "region": "europe-west1",

@@ -8,6 +8,11 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
     try {
         const cookieStore = await cookies();
+        const consent = cookieStore.get("ap_analytics_consent")?.value;
+        if (consent !== "granted") {
+            return NextResponse.json({ ok: false, reason: "CONSENT_REQUIRED" }, { status: 200 });
+        }
+
         const sessionId = cookieStore.get("ap_visitor_session")?.value;
         if (!sessionId) {
             return NextResponse.json({ ok: false, reason: "NO_SESSION" }, { status: 200 });

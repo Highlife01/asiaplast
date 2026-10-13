@@ -11,12 +11,12 @@ ASIAPLAST is an enterprise-grade international B2B showcase and RFQ (Request for
 ## Key Architecture & Features
 
 1. **5 Supported Locales**:
-   - English (`/en` — default)
+   - English (unprefixed: `/`, `/products`, …)
    - Turkish (`/tr`)
    - German (`/de`)
    - French (`/fr`)
    - Arabic (`/ar` with automatic RTL layout switching)
-   - Canonical URL routing enforced: root `/` dynamically redirects to `/{locale}` based on visitor `Accept-Language`.
+   - `/en` and `/en/...` redirect (308) to the unprefixed path.
 
 2. **Full Product Showcase & Dynamic Catalog**:
    - Product catalog with 8 categories & technical spec sheets (microns, tensile strength, seal types, ASTM/EN standards).
@@ -32,8 +32,9 @@ ASIAPLAST is an enterprise-grade international B2B showcase and RFQ (Request for
    - Verified via automated verification tool: `npm run check:storage`.
 
 5. **Central Command Admin Portal (`/admin`)**:
-   - Server-side HttpOnly HMAC-SHA256 cookie session (`ap_admin_session`).
-   - Real-time interactive dashboard: quotation management, status workflow (`pending`, `reviewing`, `quoted`, `archived`), message inquiries, search, and CSV export.
+   - Server-side HttpOnly HMAC-SHA256 cookie session (`__session`, the only cookie name Firebase Hosting forwards to the backend).
+   - Real-time interactive dashboard: quotation management, status workflow (`new`, `reviewing`, `answered`, `converted`, `closed`), message inquiries, search, and CSV export.
+   - Admin API routes return `401` when unauthenticated, `400` for invalid status values and `403` for cross-origin state-changing requests.
    - Protected behind `/admin/login` using credentials configured via environment variables.
 
 ---
@@ -50,13 +51,16 @@ Copy `.env.example` to `.env.local`:
 cp .env.example .env.local
 ```
 
-Configure your variables:
+Configure your variables (never commit real secrets):
 ```env
 NEXT_PUBLIC_SITE_URL=https://asiaplast.web.app
-ADMIN_EMAIL=admin@asiaplast.com
-ADMIN_PASSWORD=AsiaPlast2026!
-ADMIN_SESSION_SECRET=your-secure-random-secret
+ADMIN_EMAIL=
+ADMIN_PASSWORD=
+ADMIN_SESSION_SECRET=
 ```
+
+Generate `ADMIN_SESSION_SECRET` with at least 32 characters, for example:
+`node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`
 
 ### 3. Development Server
 Run the local dev server:
@@ -64,8 +68,8 @@ Run the local dev server:
 npm run dev
 ```
 Visit:
-- Showcase: [http://localhost:3000/en](http://localhost:3000/en)
-- RFQ Engine: [http://localhost:3000/en/quote](http://localhost:3000/en/quote)
+- Showcase: [http://localhost:3000](http://localhost:3000)
+- RFQ Engine: [http://localhost:3000/quote](http://localhost:3000/quote)
 - Admin Portal: [http://localhost:3000/admin](http://localhost:3000/admin)
 
 ### 4. Build & Verification

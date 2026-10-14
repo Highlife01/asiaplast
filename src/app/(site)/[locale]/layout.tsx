@@ -1,13 +1,14 @@
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { notFound } from "next/navigation";
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
 import WhatsAppButton from "@/components/site/WhatsAppButton";
-import AnalyticsConsent from "@/components/site/AnalyticsConsent";
-import VisitorTracker from "@/components/site/VisitorTracker";
+import CookieConsentBanner from "@/components/site/CookieConsentBanner";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { ACTIVE_LOCALES, isLocale, type Locale } from "@/lib/i18n/locales";
+import { getCompanySettings } from "@/lib/repo";
 
+export const dynamic = "force-dynamic";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -25,16 +26,15 @@ export default async function LocaleLayout({
     if (!isLocale(raw) || !ACTIVE_LOCALES.includes(raw)) notFound();
     const locale = raw as Locale;
     const dict = getDictionary(locale);
+    const companySettings = await getCompanySettings();
 
     return (
         <>
-            <Suspense fallback={null}>
-                <VisitorTracker />
-            </Suspense>
             <Header locale={locale} labels={{ nav: dict.nav, language: dict.site.language }} cta={dict.site.ctaQuote} />
             <main id="main">{children}</main>
             <Footer
                 locale={locale}
+                companySettings={companySettings}
                 labels={{
                     company: dict.footer.company,
                     products: dict.footer.products,
@@ -50,8 +50,10 @@ export default async function LocaleLayout({
                     admin: dict.footer.admin
                 }}
             />
-            <WhatsAppButton locale={locale} />
-            <AnalyticsConsent locale={locale} />
+            <WhatsAppButton locale={locale} phoneNumber={companySettings.whatsapp} />
+            <Suspense fallback={null}>
+                <CookieConsentBanner locale={locale} />
+            </Suspense>
         </>
     );
 }

@@ -328,58 +328,58 @@ const privateLabel: Record<Active, CopyBlock> = {
 
 const privacy: Record<Active, LegalPage> = {
     en: {
-        title: "Privacy Policy & Data Protection",
-        updated: "12 October 2026",
+        title: "Privacy policy",
+        updated: "11 October 2026",
         sections: [
-            { heading: "Data Controller", text: "AsiaPlast Polimer ve Plastik Sanayi Dış Ticaret A.Ş. (Tax ID: 0910842190 - İkitelli Tax Office, Mersis: 0091084219000001, Trade Registry: 842190-5) operates this portal to process corporate wholesale and export inquiries under GDPR and Turkish Data Protection Law (KVKK Law No: 6698)." },
-            { heading: "What We Collect", text: "When you submit a contact, quotation, or technical datasheet (TDS) request, we collect your name, company name, corporate email, phone/WhatsApp, target country, specifications, and language preference. We do not sell or lease corporate data." },
-            { heading: "Purpose & Legal Grounds", text: "Data is processed strictly to prepare B2B commercial quotations, verify technical extrusion parameters, issue proforma invoices, and fulfill delivery orders under legitimate business interest and contractual performance." },
-            { heading: "Data Retention & Security", text: "Records are stored in secure cloud systems for commercial and fiscal audit compliance periods, after which they are systematically deleted or anonymized." },
-            { heading: "Your Rights & Contact", text: "You may exercise your rights of access, rectification, or deletion by contacting export@asiaplast.com.tr or writing to our Global Export Office at Dünya Ticaret Merkezi, A-2 Blok Kat: 9, Bakırköy / İstanbul." }
+            { heading: "Who we are", text: "ASIAPLAST operates this website to receive business enquiries from buyers and distributors. Contact: the export desk email published on the contact page." },
+            { heading: "What we collect", text: "When you submit a contact or quotation form we store your name, company, email, phone (if given), country, message, locale, page source, a hashed IP and user-agent. We do not sell this data." },
+            { heading: "Why we process it", text: "To answer your enquiry, prepare a quotation and, if you become a customer, to fulfil the order. Legal basis: legitimate interest in responding to B2B requests, and contract where an order follows." },
+            { heading: "Retention", text: "Enquiry records are kept for as long as needed to handle the request and related commercial follow-up, then deleted or anonymised." },
+            { heading: "Your rights", text: "You may ask for access, correction or deletion of your enquiry data by emailing the export desk. This site does not use advertising cookies or third-party trackers by default." }
         ]
     },
     tr: {
-        title: "Gizlilik Politikası ve KVKK Aydınlatma Metni",
-        updated: "12 Ekim 2026",
+        title: "Gizlilik politikası",
+        updated: "11 Ekim 2026",
         sections: [
-            { heading: "Veri Sorumlusu", text: "6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) uyarınca veri sorumlusu: AsiaPlast Polimer ve Plastik Sanayi Dış Ticaret A.Ş. (İkitelli Vergi Dairesi - 0910842190 | Mersis No: 0091084219000001 | Ticaret Sicil No: 842190-5)." },
-            { heading: "Toplanan Veriler", text: "İletişim, teklif alma ve TDS teknik föy talep formları üzerinden paylaşılan ad-soyad, kurumsal unvan, iş e-postası, telefon/WhatsApp, ülke ve teknik ürün talepleri işlenmektedir. Verileriniz üçüncü şahıslara ticari amaçla satılmaz." },
-            { heading: "İşleme Amacı ve Hukuki Sebepler", text: "Veriler; B2B teklif ve proforma fatura düzenlenmesi, teknik üretim fizibilitesi yapılması ve sözleşme süreçlerinin yürütülmesi amaçlarıyla KVKK 5/2 maddesi kapsamında meşru menfaat ve sözleşmenin ifası hukuki sebepleriyle işlenir." },
-            { heading: "Saklama Süresi ve Güvenlik", text: "Toplanan ticari talep kayıtları, yasal zamanaşımı ve ticari arşiv süreleri boyunca güvenli sunucularda saklanır; sürenin bitiminde imha edilir veya anonim hale getirilir." },
-            { heading: "Haklarınız ve Başvuru", text: "KVKK'nın 11. maddesi kapsamındaki haklarınızı export@asiaplast.com.tr e-posta adresimiz üzerinden veya DTM Bakırköy / İstanbul İhracat Ofisimize yazılı olarak başvurarak kullanabilirsiniz." }
+            { heading: "Kimiz", text: "ASIAPLAST bu siteyi alıcı ve distribütör taleplerini almak için işletir. İletişim: iletişim sayfasındaki ihracat e-postası." },
+            { heading: "Topladığımız veri", text: "Formlarda ad, firma, e-posta, telefon (varsa), ülke, mesaj, dil, kaynak sayfa, hash'lenmiş IP ve tarayıcı bilgisi saklanır. Veri satılmaz." },
+            { heading: "Amaç", text: "Talebinize yanıt vermek, teklif hazırlamak ve sipariş oluşursa yerine getirmek. Hukuki dayanak: meşru menfaat ve sözleşme." },
+            { heading: "Saklama", text: "Kayıtlar talebin ve ticari takibin gerektirdiği süre tutulur, sonra silinir veya anonimleştirilir." },
+            { heading: "Haklarınız", text: "İhracat masasına yazarak erişim, düzeltme veya silme talep edebilirsiniz. Site varsayılan olarak reklam çerezi kullanmaz." }
         ]
     },
     de: {
-        title: "Datenschutzerklärung & DSGVO-Hinweise",
-        updated: "12. Oktober 2026",
+        title: "Datenschutzerklärung",
+        updated: "11. Oktober 2026",
         sections: [
-            { heading: "Verantwortliche Stelle", text: "Verantwortlicher im Sinne der DSGVO und des türkischen Datenschutzgesetzes (KVKK Nr. 6698): AsiaPlast Polimer ve Plastik Sanayi Dış Ticaret A.Ş. (USt-IdNr.: 0910842190, Mersis: 0091084219000001, Handelsregister: 842190-5)." },
-            { heading: "Erhobene Daten", text: "Bei Kontaktaufnahme, Angebotsanfragen oder TDS-Datenblattabrufen verarbeiten wir Name, Firmenname, geschäftliche E-Mail, Telefon/WhatsApp, Zielland und Produktspezifikationen." },
-            { heading: "Zweck und Rechtsgrundlage", text: "Die Datenverarbeitung erfolgt zur Bearbeitung gewerblicher B2B-Anfragen, Erstellung von Proforma-Rechnungen und Vertragsanbahnung gem. Art. 6 Abs. 1 lit. b und f DSGVO." },
-            { heading: "Speicherdauer", text: "Anfragedaten werden gemäß den gesetzlichen handels- und steuerrechtlichen Aufbewahrungspflichten gespeichert und anschließend datenschutzkonform gelöscht." },
-            { heading: "Betroffenenrechte", text: "Sie haben das Recht auf Auskunft, Berichtigung und Löschung. Wenden Sie sich bitte an export@asiaplast.com.tr oder schriftlich an unser Exportbüro am World Trade Center (DTM), Bakırköy / Istanbul." }
+            { heading: "Verantwortlicher", text: "ASIAPLAST betreibt diese Website für geschäftliche Anfragen. Kontakt: die auf der Kontaktseite genannte Export-E-Mail." },
+            { heading: "Daten", text: "Name, Firma, E-Mail, Telefon (falls), Land, Nachricht, Sprache, Quellseite, gehashte IP und User-Agent. Kein Verkauf." },
+            { heading: "Zweck", text: "Beantwortung, Angebot und Vertragserfüllung. Grundlage: berechtigtes Interesse und Vertrag." },
+            { heading: "Speicher", text: "Solange für Anfrage und Nachverfolgung nötig, danach Löschung oder Anonymisierung." },
+            { heading: "Rechte", text: "Auskunft, Berichtigung, Löschung über den Export-Desk. Keine Werbe-Cookies standardmäßig." }
         ]
     },
     fr: {
-        title: "Politique de Confidentialité et RGPD",
-        updated: "12 octobre 2026",
+        title: "Politique de confidentialité",
+        updated: "11 octobre 2026",
         sections: [
-            { heading: "Responsable du Traitement", text: "AsiaPlast Polimer ve Plastik Sanayi Dış Ticaret A.Ş. (N° d'enregistrement fiscal : 0910842190, Mersis : 0091084219000001, Registre du commerce : 842190-5) exploite cette plateforme conformément au RGPD et à la loi turque KVKK n° 6698." },
-            { heading: "Données Collectées", text: "Nous collectons nom, entreprise, e-mail professionnel, téléphone/WhatsApp, pays de destination et spécifications techniques fournis lors des demandes de devis et fiches TDS." },
-            { heading: "Finalités et Bases Légales", text: "Les données sont traitées pour l'établissement de propositions commerciales B2B, études de faisabilité et exécution contractuelle (Art. 6.1.b et 6.1.f RGPD)." },
-            { heading: "Conservation des Données", text: "Les dossiers commerciaux sont conservés pendant les durées légales de prescription commerciale avant archivage sécurisé ou suppression." },
-            { heading: "Vos Droits", text: "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et d'effacement via export@asiaplast.com.tr ou auprès de notre Bureau Export au World Trade Center d'Istanbul." }
+            { heading: "Responsable", text: "ASIAPLAST exploite ce site pour les demandes B2B. Contact : l'e-mail export indiqué sur la page contact." },
+            { heading: "Données", text: "Nom, société, e-mail, téléphone (le cas échéant), pays, message, langue, page source, IP hachée et user-agent. Pas de vente." },
+            { heading: "Finalité", text: "Répondre, établir un devis et exécuter une commande. Base : intérêt légitime et contrat." },
+            { heading: "Conservation", text: "Le temps nécessaire au traitement et au suivi commercial, puis suppression ou anonymisation." },
+            { heading: "Droits", text: "Accès, rectification, suppression via le bureau export. Pas de cookies publicitaires par défaut." }
         ]
     },
     ar: {
-        title: "سياسة الخصوصية وحماية البيانات",
-        updated: "12 أكتوبر 2026",
+        title: "سياسة الخصوصية",
+        updated: "11 أكتوبر 2026",
         sections: [
-            { heading: "المسؤول عن معالجة البيانات", text: "شركة AsiaPlast Polimer ve Plastik Sanayi Dış Ticaret A.Ş. (الرقم الضريبي: 0910842190 - إيكيتيلي، رقم السجل التجاري: 842190-5، ميرسيس: 0091084219000001) تدير هذا الموقع وفق اللائحة العامة لحماية البيانات والقانون التركي KVKK رقم 6698." },
-            { heading: "البيانات التي نجمعها", text: "عند تقديم طلب عرض أسعار أو بطاقة TDS فنية، نجمع الاسم، اسم الشركة، البريد التجاري، الهاتف، بلد الوجهة والمواصفات الفنية المطلوبة. لا نبيع بيانات الشركات إطلاقاً." },
-            { heading: "الغرض والأساس القانوني", text: "تُعالج البيانات لإعداد عروض الأسعار وفواتير البروفورما وتنفيذ عقود التصدير وفق المصلحة المشروعة والوفاء بالعقود." },
-            { heading: "فترة الاحتفاظ بالبيانات", text: "تُحفظ السجلات طوال الفترة القانونية والتجارية اللازمة ثم تُحذف أو تُعمّى بشكل آمن." },
-            { heading: "حقوقكم والتواصل", text: "يحق لكم طلب الوصول إلى البيانات أو تعديلها عبر مراسلة export@asiaplast.com.tr أو مراسلة مكتب التصدير الدولي في مركز التجارة العالمي، بكركوي / إسطنبول." }
+            { heading: "المسؤول", text: "تشغّل ASIAPLAST هذا الموقع لاستقبال طلبات الأعمال. التواصل: بريد التصدير في صفحة الاتصال." },
+            { heading: "البيانات", text: "الاسم والشركة والبريد والهاتف (إن وُجد) والبلد والرسالة واللغة والصفحة المصدر وIP مُعمّى ووكيل المستخدم. لا نبيع البيانات." },
+            { heading: "الغرض", text: "الرد وإعداد العرض وتنفيذ الطلب. الأساس: المصلحة المشروعة والعقد." },
+            { heading: "الاحتفاظ", text: "طالما يلزم لمعالجة الطلب والمتابعة، ثم الحذف أو إخفاء الهوية." },
+            { heading: "حقوقك", text: "يمكنك طلب الاطلاع أو التصحيح أو الحذف عبر مكتب التصدير. لا نستخدم كوكيز إعلانية افتراضياً." }
         ]
     }
 };

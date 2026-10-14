@@ -4,15 +4,16 @@
     "private": true,
     "description": "ASIAPLAST — Global garbage bags manufacturer & exporter. Multilingual B2B website, RFQ engine and Firebase-powered admin dashboard.",
     "scripts": {
-        "dev": "next dev -p 3000",
+        "dev": "next dev -H 127.0.0.1 -p 3000",
         "build": "next build",
-        "start": "next start -p 3000",
+        "start": "next start -H 127.0.0.1 -p 3000",
         "typecheck": "tsc --noEmit",
         "seed": "tsx scripts/seed-products.ts",
         "admin:set": "tsx scripts/set-admin.ts",
         "check:storage": "node scripts/check-no-storage.mjs",
-        "clean:hosting": "node scripts/cleanup-hosting-releases.mjs --execute",
-        "clean:hosting:check": "node scripts/cleanup-hosting-releases.mjs --dry-run"
+        "cleanup:hosting:dry": "node scripts/cleanup-hosting-versions.mjs --site=asiaplast",
+        "cleanup:hosting": "node scripts/cleanup-hosting-versions.mjs --apply --site=asiaplast",
+        "deploy:hosting": "node -e \"process.env.NODE_OPTIONS='--require ./scripts/win-symlink-shim.cjs'; require('child_process').execFileSync(process.platform==='win32'?'firebase.cmd':'firebase', ['deploy', '--only', 'storage,hosting:asiaplast', '--project', 'ajansonline'], {stdio:'inherit', shell:process.platform==='win32'})\""
     },
     "dependencies": {
         "firebase": "^10.12.5",
@@ -20,7 +21,6 @@
         "next": "^14.2.5",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
-        "server-only": "^0.0.1",
         "zod": "^3.23.8"
     },
     "devDependencies": {
@@ -34,6 +34,6 @@
         "typescript": "^5.5.3"
     },
     "engines": {
-        "node": "20"
+        "node": "22"
     }
 }

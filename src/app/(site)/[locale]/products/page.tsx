@@ -4,31 +4,19 @@ import SectionHeading from "@/components/site/SectionHeading";
 import JsonLd from "@/components/site/JsonLd";
 import { ProductCard, CategoryCard } from "@/components/site/ProductCards";
 import { getDictionary } from "@/lib/i18n/dictionaries";
-import { ACTIVE_LOCALES, isLocale, type Locale } from "@/lib/i18n/locales";
+import { isLocale, type Locale } from "@/lib/i18n/locales";
 import { buildMetadata, breadcrumbJsonLd, localePath } from "@/lib/seo";
 import { CATEGORIES } from "@/data/catalog";
 import { loadCatalogProducts } from "@/lib/catalog";
 
-export const revalidate = 300;
-
-export async function generateStaticParams() {
-    return ACTIVE_LOCALES.map((locale) => ({ locale }));
-}
-
-const CATALOG_TITLES: Partial<Record<Locale, string>> = {
-    tr: "Toptan Çöp Poşeti ve İhracat Kataloğu | ASIAPLAST",
-    en: "Wholesale Garbage Bags & Bin Liners Catalog | ASIAPLAST",
-    de: "Müllsäcke & Abfallsäcke Großhandelskatalog | ASIAPLAST",
-    fr: "Catalogue Grossiste Sacs Poubelle & Housses | ASIAPLAST",
-    ar: "كتالوج أكياس القمامة بالجملة وتصدير الحاويات | ASIAPLAST"
-};
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
     const l = (isLocale(locale) ? locale : ("en" as Locale));
     const dict = getDictionary(l);
     return buildMetadata({
-        title: CATALOG_TITLES[l] || `${dict.sections.productsTitle} | ASIAPLAST`,
+        title: `${dict.sections.productsTitle} — Wholesale Garbage Bags & Bin Liners`,
         description: dict.sections.productsLead,
         path: "/products",
         locale: l

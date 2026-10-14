@@ -1,68 +1,70 @@
-import "server-only";
-import { CATEGORIES, getLocalizedProducts, getLocalizedProduct, type SeedProduct } from "@/data/catalog";
-import { getProductBySlug, getProducts } from "@/lib/repo";
+import { CATEGORIES, SEED_PRODUCTS, type SeedProduct } from "@/data/catalog";
+import { getProductBySlug, getProducts, resolveProductSlugRedirect, type ProductDoc } from "@/lib/repo";
 import { englishSlug } from "@/lib/seo";
 import type { Locale } from "@/lib/i18n/locales";
 
-export async function loadCatalogProducts(locale?: Locale): Promise<SeedProduct[]> {
-    const localizedSeed = getLocalizedProducts(locale);
-    try {
-        const docs = await getProducts();
-        if (docs.length) {
-            return docs.map((d) => {
-                const seedMatch = localizedSeed.find((s) => s.slug === d.slug);
-                return {
-                    slug: d.slug,
-                    categoryId: d.categoryId,
-                    name: seedMatch?.name || d.name,
-                    shortDescription: seedMatch?.shortDescription || d.shortDescription,
-                    description: seedMatch?.description || d.description,
-                    standards: seedMatch?.standards,
-                    moq: seedMatch?.moq || d.moq || "On request",
-                    sortOrder: d.sortOrder,
-                    specs: seedMatch?.specs || d.specs
-                };
-            });
-        }
-    } catch {
-        /* Firestore unreachable — seed catalog */
-    }
-    return localizedSeed;
+if (typeof window !== "undefined") {
+    throw new Error("catalog module can only be imported on the server.");
 }
 
-export async function loadCatalogProduct(slug: string, locale?: Locale): Promise<SeedProduct | null> {
+function localizeProduct(d: ProductDoc, locale?: Locale): SeedProduct {
+    const tr = locale && d.translations?.[locale] ? d.translations[locale] : undefined;
+    return {
+        id: d.id,
+        slug: d.slug,
+        active: d.active,
+        categoryId: d.categoryId,
+        name: tr?.name?.trim() || d.name,
+        shortDescription: tr?.shortDescription?.trim() || d.shortDescription,
+        description: tr?.description?.trim() || d.description,
+        imageUrl: d.imageUrl || null,
+        moq: d.moq || "On request",
+        sortOrder: d.sortOrder,
+        specs: d.specs,
+        translations: d.translations
+    };
+}
+
+export async function loadCatalogProducts(locale?: Locale): Promise<SeedProduct[]> {
+    try {
+        const docs = await getProducts({ includeInactive: false });
+        return docs.map((d) => localizeProduct(d, locale));
+    } catch {
+        return SEED_PRODUCTS;
+    }
+}
+
+export async function loadCatalogProductWithRedirect(
+    slug: string,
+    locale?: Locale
+): Promise<{ product: SeedProduct | null; redirectToSlug: string | null }> {
     const key = englishSlug(slug);
-    const localizedSeed = getLocalizedProduct(key, locale);
     try {
         const doc = await getProductBySlug(key);
         if (doc) {
-            return {
-                slug: doc.slug,
-                categoryId: doc.categoryId,
-                name: localizedSeed?.name || doc.name,
-                shortDescription: localizedSeed?.shortDescription || doc.shortDescription,
-                description: localizedSeed?.description || doc.description,
-                standards: localizedSeed?.standards,
-                moq: localizedSeed?.moq || doc.moq || "On request",
-                sortOrder: doc.sortOrder,
-                specs: localizedSeed?.specs || doc.specs
-            };
+            return { product: localizeProduct(doc, locale), redirectToSlug: null };
+        }
+        const redirected = await resolveProductSlugRedirect(key);
+        if (redirected) {
+            return { product: null, redirectToSlug: redirected };
         }
     } catch {
-        /* fall back */
+        // Fallback if Firestore transiently unavailable
     }
-    return localizedSeed;
+    return { product: null, redirectToSlug: null };
 }
 
-export function productLabelFor(id: string | null | undefined, locale?: Locale): string {
+export async function loadCatalogProduct(slug: string, locale?: Locale): Promise<SeedProduct | null> {
+    const { product } = await loadCatalogProductWithRedirect(slug, locale);
+    return product;
+}
+
+export function productLabelFor(id: string | null | undefined): string {
     if (!id) return "";
     const key = englishSlug(id);
-    const localized = getLocalizedProduct(key, locale);
-    if (localized) return localized.name;
-    const cat = CATEGORIES.find((c) => c.id === key);
-    if (cat) {
-        const l = (locale === "tr" || locale === "de" || locale === "fr" || locale === "ar") ? locale : "en";
-        return cat[l]?.name || cat.en.name;
-    }
-    return key;
+    return (
+        SEED_PRODUCTS.find((p) => p.slug === key)?.name ||
+        CATEGORIES.find((c) => c.id === key)?.en.name ||
+        key
+    );
 }

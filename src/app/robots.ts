@@ -7,13 +7,12 @@ export default function robots(): MetadataRoute.Robots {
             {
                 userAgent: "*",
                 allow: "/",
-                disallow: ["/admin", "/admin/", "/api/"]
+                disallow: ["/dashboard", "/dashboard/", "/admin", "/admin/", "/api/"]
             },
-            // Explicitly welcome major AI crawlers (GEO): they may read public content.
-            { userAgent: "GPTBot", allow: "/" },
-            { userAgent: "OAI-SearchBot", allow: "/" },
-            { userAgent: "PerplexityBot", allow: "/" },
-            { userAgent: "Google-Extended", allow: "/" }
+            { userAgent: "GPTBot", allow: "/", disallow: ["/dashboard", "/dashboard/", "/admin", "/admin/", "/api/"] },
+            { userAgent: "OAI-SearchBot", allow: "/", disallow: ["/dashboard", "/dashboard/", "/admin", "/admin/", "/api/"] },
+            { userAgent: "PerplexityBot", allow: "/", disallow: ["/dashboard", "/dashboard/", "/admin", "/admin/", "/api/"] },
+            { userAgent: "Google-Extended", allow: "/", disallow: ["/dashboard", "/dashboard/", "/admin", "/admin/", "/api/"] }
         ],
         sitemap: `${SITE_URL}/sitemap.xml`,
         host: SITE_URL

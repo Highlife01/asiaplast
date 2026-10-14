@@ -11,7 +11,10 @@
             "region": "europe-west1",
             "maxInstances": 10,
             "minInstances": 0
-        }
+        },
+        "postdeploy": [
+            "node scripts/cleanup-hosting-versions.mjs --apply"
+        ]
     },
     "firestore": {
         "rules": "firestore.rules",

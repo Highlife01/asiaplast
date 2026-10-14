@@ -1,7 +1,7 @@
 {
     "indexes": [
         {
-            "collectionGroup": "contactMessages",
+            "collectionGroup": "asiaplast_messages",
             "queryScope": "COLLECTION",
             "fields": [
                 {
@@ -15,7 +15,7 @@
             ]
         },
         {
-            "collectionGroup": "quoteRequests",
+            "collectionGroup": "asiaplast_quotes",
             "queryScope": "COLLECTION",
             "fields": [
                 {
@@ -29,7 +29,7 @@
             ]
         },
         {
-            "collectionGroup": "orders",
+            "collectionGroup": "asiaplast_orders",
             "queryScope": "COLLECTION",
             "fields": [
                 {
@@ -43,7 +43,7 @@
             ]
         },
         {
-            "collectionGroup": "products",
+            "collectionGroup": "asiaplast_products",
             "queryScope": "COLLECTION",
             "fields": [
                 {

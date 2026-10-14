@@ -2,6 +2,7 @@
 const nextConfig = {
     reactStrictMode: true,
     poweredByHeader: false,
+    skipMiddlewareUrlNormalize: true,
     images: {
         remotePatterns: [
             { protocol: "https", hostname: "firebasestorage.googleapis.com" },
@@ -18,6 +19,18 @@ const nextConfig = {
                     { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
                     { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" }
                 ]
+            },
+            {
+                source: "/dashboard",
+                headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }]
+            },
+            {
+                source: "/dashboard/:path*",
+                headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }]
+            },
+            {
+                source: "/admin",
+                headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }]
             },
             {
                 source: "/admin/:path*",

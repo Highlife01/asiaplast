@@ -1,65 +1,94 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { contactSchema, looksLikeSpam } from "@/lib/validation";
 import { createContactMessage } from "@/lib/repo";
 import { rateLimit } from "@/lib/rateLimit";
-import { getClientIp } from "@/lib/session";
+import { getClientIp, getSessionBag, verifySameOrigin } from "@/lib/session";
 import { RATE_LIMITS } from "@/lib/config";
-import { markSessionConversion } from "@/lib/analytics";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
     try {
+        if (!(await verifySameOrigin(request))) {
+            return NextResponse.json({ error: "Forbidden origin" }, { status: 403 });
+        }
+
         const ip = await getClientIp();
         const burst = rateLimit(`contact:${ip}`, 3, RATE_LIMITS.contactMs);
         if (!burst.allowed) {
             return NextResponse.json(
-                { error: "Çok fazla istek gönderildi. Lütfen bekleyin.", code: "RATE_LIMITED" },
+                { error: "Çok fazla istek gönderildi. Lütfen kısa süre sonra tekrar deneyin.", code: "RATE_LIMITED" },
                 { status: 429, headers: { "Retry-After": String(burst.retryAfterSeconds) } }
             );
         }
         const hourly = rateLimit(`contact-hour:${ip}`, RATE_LIMITS.hourlyMax, 3600_000);
         if (!hourly.allowed) {
             return NextResponse.json(
-                { error: "Saatlik istek sınırı aşıldı. Lütfen daha sonra deneyin.", code: "RATE_LIMITED" },
+                { error: "Saatlik gönderim sınırına ulaşıldı. Lütfen daha sonra tekrar deneyin.", code: "RATE_LIMITED" },
                 { status: 429, headers: { "Retry-After": String(hourly.retryAfterSeconds) } }
             );
         }
 
         const body = await request.json().catch(() => null);
         if (!body) {
-            return NextResponse.json({ error: "Geçersiz istek gövdesi (Invalid JSON)" }, { status: 400 });
+            return NextResponse.json({ error: "Geçersiz JSON verisi" }, { status: 400 });
         }
 
         const parsed = contactSchema.safeParse(body);
         if (!parsed.success) {
             return NextResponse.json(
-                { error: "Doğrulama başarısız oldu. Lütfen tüm zorunlu alanları doldurun.", issues: parsed.error.flatten().fieldErrors },
+                { error: "Doğrulama hatası", issues: parsed.error.flatten().fieldErrors },
                 { status: 400 }
             );
         }
 
-        if (looksLikeSpam(parsed.data.message) || looksLikeSpam(parsed.data.name)) {
-            return NextResponse.json(
-                { error: "Mesajınız güvenlik/spam filtresine takıldı. Lütfen içeriği kontrol edin." },
-                { status: 400 }
-            );
+        // Honeypot spam filter
+        if (parsed.data.honeypot && parsed.data.honeypot.trim().length > 0) {
+            return NextResponse.json({ ok: true, id: "filtered" });
         }
 
-        const id = await createContactMessage({ ...parsed.data, ip });
-
-        // Connect with visitor session if present
-        const cookieStore = await cookies();
-        const visitorSessionId = cookieStore.get("ap_visitor_session")?.value;
-        if (visitorSessionId) {
-            await markSessionConversion(visitorSessionId, "contact", id);
+        if (
+            looksLikeSpam(parsed.data.message) ||
+            looksLikeSpam(parsed.data.name) ||
+            looksLikeSpam(parsed.data.subject || "")
+        ) {
+            return NextResponse.json({ ok: true, id: "filtered" });
         }
 
-        return NextResponse.json({ ok: true, id }, { status: 201 });
+        const bag = await getSessionBag();
+        const sessionId = bag.consent === "all" && bag.sid ? bag.sid : null;
+        const testHeader = request.headers.get("x-asiaplast-test") === "1";
+
+        const result = await createContactMessage({
+            name: parsed.data.name,
+            company: parsed.data.company,
+            email: parsed.data.email,
+            phone: parsed.data.phone,
+            country: parsed.data.country,
+            subject: parsed.data.subject,
+            message: parsed.data.message,
+            locale: parsed.data.locale,
+            sourcePage: parsed.data.sourcePage,
+            sessionId,
+            idempotencyKey: parsed.data.idempotencyKey,
+            isTest: Boolean(parsed.data.isTest || testHeader)
+        });
+
+        return NextResponse.json(
+            {
+                ok: true,
+                id: result.id,
+                deduplicated: result.deduplicated,
+                confirmedAt: new Date().toISOString()
+            },
+            { status: 201 }
+        );
     } catch (err) {
         console.error("[contact] submission failed:", err);
-        return NextResponse.json({ error: "Sunucu veritabanı kayıt hatası. Lütfen daha sonra tekrar deneyin." }, { status: 500 });
+        return NextResponse.json(
+            { error: "Sunucu hatası — mesajınız kaydedilemedi. Lütfen tekrar deneyin." },
+            { status: 500 }
+        );
     }
 }

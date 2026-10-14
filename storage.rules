@@ -2,14 +2,53 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    // Product & media images are publicly readable (used on public pages).
-    match /media/{allPaths=**} {
+
+    // ASIAPLAST product & media images — public read, verified admin write only
+    match /asiaplast/{allPaths=**} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.token.admin == true;
+      allow write: if request.auth != null
+                   && (request.auth.token.admin == true || request.auth.token.asiaplastAdmin == true)
+                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/(jpeg|png|webp|avif)');
     }
 
+    // Shared ajansonline Storage rules (preserved)
+    match /news/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    match /videos/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.resource.size < 50 * 1024 * 1024
+                   && request.resource.contentType.matches('video/.*');
+    }
+
+    match /authors/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.resource.size < 2 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    match /assets/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.resource.size < 5 * 1024 * 1024;
+    }
+
+    match /user_news/{allPaths=**} {
+      allow read: if false;
+      allow write: if request.resource.size < 25 * 1024 * 1024
+                   && (request.resource.contentType.matches('image/.*') || request.resource.contentType.matches('video/.*'));
+    }
+
+    // Default deny
     match /{allPaths=**} {
-      allow read, write: if request.auth != null && request.auth.token.admin == true;
+      allow read, write: if false;
     }
   }
 }

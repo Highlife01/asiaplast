@@ -2,15 +2,13 @@ import type { Metadata } from "next";
 import QuoteForm from "@/components/site/QuoteForm";
 import JsonLd from "@/components/site/JsonLd";
 import { getDictionary } from "@/lib/i18n/dictionaries";
-import { ACTIVE_LOCALES, isLocale, type Locale } from "@/lib/i18n/locales";
+import { getCategoryCopy } from "@/lib/i18n/content";
+import { isLocale, type Locale } from "@/lib/i18n/locales";
 import { buildMetadata, breadcrumbJsonLd, localePath } from "@/lib/seo";
-import { SEED_PRODUCTS, CATEGORIES } from "@/data/catalog";
+import { CATEGORIES } from "@/data/catalog";
+import { loadCatalogProducts } from "@/lib/catalog";
 
-export const revalidate = 300;
-
-export async function generateStaticParams() {
-    return ACTIVE_LOCALES.map((locale) => ({ locale }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
@@ -31,11 +29,13 @@ export default async function QuotePage({
     const l = (isLocale(locale) ? locale : ("en" as Locale));
     const dict = getDictionary(l);
 
-    const categories = CATEGORIES.map((c) => ({ id: c.id, name: c.en.name }));
-    const productOptions = SEED_PRODUCTS.map((p) => ({
+    const activeProducts = await loadCatalogProducts(l);
+    const categories = CATEGORIES.map((c) => ({ id: c.id, name: getCategoryCopy(l, c.id).name }));
+    const productOptions = activeProducts.map((p) => ({
         id: p.slug,
         name: p.name,
-        category: CATEGORIES.find((c) => c.id === p.categoryId)?.en.name || ""
+        categoryId: p.categoryId,
+        category: getCategoryCopy(l, p.categoryId).name
     }));
 
     return (

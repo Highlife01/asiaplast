@@ -1,26 +1,37 @@
-/** Shared server configuration constants (no secrets). */
+/** Shared configuration constants and status definitions (no secrets). */
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://asiaplast.web.app").replace(/\/$/, "");
 
-export const COMPANY = {
+export const DEFAULT_COMPANY_SETTINGS = {
     name: "ASIAPLAST",
-    legalTitle: "AsiaPlast Polimer ve Plastik Sanayi Dış Ticaret A.Ş.",
-    factoryAddress: "Organize Sanayi Bölgesi, 4. Cadde No: 18, Başakşehir / İstanbul, Türkiye",
-    exportOffice: "Dünya Ticaret Merkezi, A-2 Blok Kat: 9, Bakırköy / İstanbul, Türkiye",
-    phone: "+90 212 671 00 00",
+    legalName: "ASIAPLAST Plastik ve Ambalaj Sanayi",
     email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "export@asiaplast.com",
+    phone: "+90 533 684 01 75",
     whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || "+905336840175",
     country: process.env.NEXT_PUBLIC_CONTACT_COUNTRY || "Turkey",
-    taxOffice: "İkitelli Vergi Dairesi",
-    taxNumber: "0910842190",
-    mersis: "0091084219000001",
-    ticaretSicilNo: "842190-5",
-    certifications: [
-        { code: "ISO 9001:2015", title: "Kalite Yönetim Sistemi", scope: "Tesis Genel Üretim Standardı" },
-        { code: "EN 13592", title: "Evsel Atık Torbaları Standardı", scope: "Ev Tipi ve Büzgülü Torbalar" },
-        { code: "ASTM D1709", title: "Düşen Dart Darbe Dayanımı Testi", scope: "Ağır Hizmet ve Şantiye Torbaları" },
-        { code: "UN 3291", title: "Biyotehlikeli Klinik Atık Ambalajı", scope: "Medikal & Hastane Atık Torbaları" }
-    ]
+    city: "Adana",
+    address: "Adana, Türkiye",
+    workingHours: "Pazartesi – Cumartesi, 08:30 – 18:00 (UTC+3)",
+    socialLinks: {
+        linkedin: "",
+        instagram: "",
+        facebook: "",
+        youtube: "",
+        x: ""
+    },
+    analyticsRetentionDays: 90
+};
+
+export type CompanySettings = typeof DEFAULT_COMPANY_SETTINGS & {
+    updatedAt?: string | null;
+    updatedBy?: string | null;
+};
+
+export const COMPANY = {
+    name: DEFAULT_COMPANY_SETTINGS.name,
+    email: DEFAULT_COMPANY_SETTINGS.email,
+    whatsapp: DEFAULT_COMPANY_SETTINGS.whatsapp,
+    country: DEFAULT_COMPANY_SETTINGS.country
 } as const;
 
 export const CONTACT_SOURCES = {
@@ -30,21 +41,59 @@ export const CONTACT_SOURCES = {
 
 export const RATE_LIMITS = {
     /** Milliseconds between accepted submissions per IP+form. */
-    contactMs: 30_000,
-    quoteMs: 30_000,
+    contactMs: 15_000,
+    quoteMs: 15_000,
     /** Max submissions per IP per hour across forms. */
-    hourlyMax: 12
+    hourlyMax: 20
 } as const;
 
 export const ADMIN_SESSION_TTL_HOURS = process.env.ADMIN_SESSION_TTL_HOURS || "12";
 
-export const ORDER_STATUSES = [
+/** Contact message statuses (Requirement 4: Okunmadı, Okundu, İşlemde, Yanıtlandı, Arşivlendi) */
+export const MESSAGE_STATUSES = [
+    "unread",
+    "read",
+    "in_progress",
+    "replied",
+    "archived"
+] as const;
+
+export type MessageStatus = (typeof MESSAGE_STATUSES)[number];
+
+export const MESSAGE_STATUS_LABELS: Record<MessageStatus, string> = {
+    unread: "Okunmadı",
+    read: "Okundu",
+    in_progress: "İşlemde",
+    replied: "Yanıtlandı",
+    archived: "Arşivlendi"
+};
+
+/** Quote request statuses (Requirement 5: Yeni, İnceleniyor, Teklif Gönderildi, Müşteri Dönüşü Bekleniyor, Onaylandı, Tamamlandı, İptal) */
+export const QUOTE_STATUSES = [
     "new",
     "reviewing",
-    "quoted",
     "quote_sent",
+    "waiting_customer",
     "approved",
-    "confirmed",
+    "completed",
+    "cancelled"
+] as const;
+
+export type QuoteStatus = (typeof QUOTE_STATUSES)[number];
+
+export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
+    new: "Yeni",
+    reviewing: "İnceleniyor",
+    quote_sent: "Teklif Gönderildi",
+    waiting_customer: "Müşteri Dönüşü Bekleniyor",
+    approved: "Onaylandı",
+    completed: "Tamamlandı",
+    cancelled: "İptal"
+};
+
+/** Confirmed Order statuses (only created after explicit admin approval) */
+export const ORDER_STATUSES = [
+    "approved",
     "in_production",
     "shipped",
     "completed",
@@ -53,5 +102,24 @@ export const ORDER_STATUSES = [
 
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 
-export const MESSAGE_STATUSES = ["new", "reviewing", "answered", "converted", "closed"] as const;
-export type MessageStatus = (typeof MESSAGE_STATUSES)[number];
+export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+    approved: "Onaylandı (Kesin Sipariş)",
+    in_production: "Üretimde",
+    shipped: "Sevk Edildi",
+    completed: "Tamamlandı",
+    cancelled: "İptal Edildi"
+};
+
+export const MESSAGE_STATUS_LABELS_TR = MESSAGE_STATUS_LABELS;
+export const QUOTE_STATUS_LABELS_TR = QUOTE_STATUS_LABELS;
+export const ORDER_STATUS_LABELS_TR = ORDER_STATUS_LABELS;
+
+export const QUANTITY_UNITS = [
+    "40' HQ Konteyner",
+    "20' DC Konteyner",
+    "Palet",
+    "Ton (MT)",
+    "Koli",
+    "Rulo",
+    "Adet"
+] as const;

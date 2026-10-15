@@ -1,73 +1,119 @@
-﻿import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 import { quoteSchema, looksLikeSpam } from "@/lib/validation";
-import { createQuoteRequest } from "@/lib/repo";
+import { createQuoteRequest, getProductBySlug } from "@/lib/repo";
 import { rateLimitShared } from "@/lib/rateLimit";
-import { getClientIp } from "@/lib/session";
+import { getClientIp, getSessionBag, verifySameOrigin } from "@/lib/session";
 import { RATE_LIMITS } from "@/lib/config";
 import { productLabelFor } from "@/lib/catalog";
-import { markSessionConversion } from "@/lib/analytics";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
     try {
+        if (!(await verifySameOrigin(request))) {
+            return NextResponse.json({ error: "Forbidden origin" }, { status: 403 });
+        }
+
         const ip = await getClientIp();
         const burst = await rateLimitShared(`quote:${ip}`, 3, RATE_LIMITS.quoteMs);
         if (!burst.allowed) {
             return NextResponse.json(
-                { error: "Ã‡ok fazla istek gÃ¶nderildi. LÃ¼tfen bekleyin.", code: "RATE_LIMITED" },
+                { error: "Çok fazla istek gönderildi. Lütfen kısa süre sonra tekrar deneyin.", code: "RATE_LIMITED" },
                 { status: 429, headers: { "Retry-After": String(burst.retryAfterSeconds) } }
             );
         }
         const hourly = await rateLimitShared(`quote-hour:${ip}`, RATE_LIMITS.hourlyMax, 3600_000);
         if (!hourly.allowed) {
             return NextResponse.json(
-                { error: "Saatlik istek sÄ±nÄ±rÄ± aÅŸÄ±ldÄ±. LÃ¼tfen daha sonra deneyin.", code: "RATE_LIMITED" },
+                { error: "Saatlik gönderim sınırına ulaşıldı. Lütfen daha sonra tekrar deneyin.", code: "RATE_LIMITED" },
                 { status: 429, headers: { "Retry-After": String(hourly.retryAfterSeconds) } }
             );
         }
 
         const body = await request.json().catch(() => null);
         if (!body) {
-            return NextResponse.json({ error: "GeÃ§ersiz istek gÃ¶vdesi (Invalid JSON)" }, { status: 400 });
+            return NextResponse.json({ error: "Geçersiz JSON verisi" }, { status: 400 });
         }
 
         const parsed = quoteSchema.safeParse(body);
         if (!parsed.success) {
             return NextResponse.json(
-                { error: "DoÄŸrulama baÅŸarÄ±sÄ±z oldu. LÃ¼tfen zorunlu alanlarÄ± kontrol edin.", issues: parsed.error.flatten().fieldErrors },
+                { error: "Doğrulama hatası", issues: parsed.error.flatten().fieldErrors },
                 { status: 400 }
             );
         }
 
-        const text = `${parsed.data.message || ""} ${parsed.data.volume}`;
-        if (looksLikeSpam(text) || looksLikeSpam(parsed.data.name)) {
+        if (parsed.data.honeypot && parsed.data.honeypot.trim().length > 0) {
+            return NextResponse.json({ ok: true, id: "filtered", requestNo: "FILTERED" });
+        }
+
+        const qty = (parsed.data.quantity || "").trim();
+        const vol = (parsed.data.volume || "").trim();
+        if (!qty && !vol) {
             return NextResponse.json(
-                { error: "Talebiniz gÃ¼venlik/spam filtresine takÄ±ldÄ±. LÃ¼tfen iÃ§eriÄŸi kontrol edin." },
+                {
+                    error: "Miktar / hacim bilgisi zorunludur.",
+                    issues: { quantity: ["Lütfen talep edilen miktarı belirtin."] }
+                },
                 { status: 400 }
             );
+        }
+
+        const text = `${parsed.data.message || ""} ${vol} ${qty}`;
+        if (looksLikeSpam(text) || looksLikeSpam(parsed.data.name)) {
+            return NextResponse.json({ ok: true, id: "filtered", requestNo: "FILTERED" });
         }
 
         const productId = parsed.data.productId || null;
-        const id = await createQuoteRequest({
-            ...parsed.data,
-            productId,
-            productLabel: productLabelFor(productId) || parsed.data.categoryId,
-            ip
-        });
-
-        // Connect with visitor session if present
-        const cookieStore = await cookies();
-        const visitorSessionId = cookieStore.get("ap_visitor_session")?.value;
-        if (visitorSessionId) {
-            await markSessionConversion(visitorSessionId, "rfq", id);
+        let resolvedLabel = productLabelFor(productId) || productLabelFor(parsed.data.categoryId) || parsed.data.categoryId;
+        if (productId) {
+            const dbProd = await getProductBySlug(productId).catch(() => null);
+            if (dbProd?.name) resolvedLabel = dbProd.name;
         }
 
-        return NextResponse.json({ ok: true, id }, { status: 201 });
+        const bag = await getSessionBag();
+        const sessionId = bag.consent === "all" && bag.sid ? bag.sid : null;
+        const testHeader = request.headers.get("x-asiaplast-test") === "1";
+
+        const result = await createQuoteRequest({
+            name: parsed.data.name,
+            company: parsed.data.company,
+            email: parsed.data.email,
+            phone: parsed.data.phone,
+            country: parsed.data.country,
+            categoryId: parsed.data.categoryId,
+            productId,
+            productLabel: resolvedLabel,
+            quantity: qty || vol,
+            unit: parsed.data.unit || "Belirtilmedi",
+            volume: vol || `${qty} ${parsed.data.unit || ""}`.trim(),
+            bagSpecs: parsed.data.bagSpecs,
+            deliveryTerm: parsed.data.deliveryTerm,
+            deliveryLocation: parsed.data.deliveryLocation,
+            message: parsed.data.message,
+            locale: parsed.data.locale,
+            sourcePage: parsed.data.sourcePage,
+            sessionId,
+            idempotencyKey: parsed.data.idempotencyKey,
+            isTest: Boolean(parsed.data.isTest || testHeader)
+        });
+
+        return NextResponse.json(
+            {
+                ok: true,
+                id: result.id,
+                requestNo: result.requestNo,
+                deduplicated: result.deduplicated,
+                confirmedAt: new Date().toISOString()
+            },
+            { status: 201 }
+        );
     } catch (err) {
         console.error("[quotes] submission failed:", err);
-        return NextResponse.json({ error: "Sunucu veritabanÄ± kayÄ±t hatasÄ±. LÃ¼tfen daha sonra tekrar deneyin." }, { status: 500 });
+        return NextResponse.json(
+            { error: "Sunucu hatası — teklif talebiniz kaydedilemedi. Lütfen tekrar deneyin." },
+            { status: 500 }
+        );
     }
 }

@@ -4,122 +4,154 @@ import { useState, type FormEvent } from "react";
 import { useI18n } from "@/lib/i18n/client";
 import type { Locale } from "@/lib/i18n/locales";
 
-export type QuoteProductOption = { id: string; name: string; category: string };
+export type QuoteProductOption = { id: string; name: string; category: string; categoryId?: string };
 
-const DELIVERY_TERMS = ["FOB", "CIF", "DAP", "EXW"] as const;
+const DELIVERY_TERMS = ["EXW", "FOB", "CIF", "DAP"] as const;
 
-interface FormLocalText {
-    gaugeLabel: string;
-    gaugePlaceholder: string;
-    gaugeOptions: { value: string; label: string }[];
-    materialLabel: string;
-    materialPlaceholder: string;
-    materialOptions: { value: string; label: string }[];
-    refHelp: string;
-    copyBtn: string;
-    copiedText: string;
-}
-
-const FORM_EXTRA_TEXT: Record<string, FormLocalText> = {
+const SPEC_LABELS: Partial<
+    Record<
+        Locale,
+        {
+            quantity: string;
+            unit: string;
+            units: { value: string; label: string }[];
+            bagSpecsTitle: string;
+            dimensions: string;
+            dimensionsPh: string;
+            color: string;
+            colorPh: string;
+            thickness: string;
+            thicknessPh: string;
+            packaging: string;
+            packagingPh: string;
+            sealType: string;
+            sealTypes: string[];
+            deliveryLocation: string;
+            deliveryLocationPh: string;
+        }
+    >
+> = {
     tr: {
-        gaugeLabel: "Hedef Kalınlık / Mikron",
-        gaugePlaceholder: "Seçiniz (veya mesajda belirtiniz)",
-        gaugeOptions: [
-            { value: "30-60 µm", label: "Standart / Ticari (30 - 60 µm)" },
-            { value: "70-100 µm", label: "Ağır Hizmet / Endüstriyel (70 - 100 µm)" },
-            { value: "110-150 µm", label: "Ekstra Güçlü / Şantiye & Konteyner (110 - 150 µm)" },
-            { value: "Custom", label: "Özel Mikron Talebi (Mesajda belirtilecek)" }
+        quantity: "Miktar / Sipariş Hacmi",
+        unit: "Birim",
+        units: [
+            { value: "Ton", label: "Ton" },
+            { value: "Koli", label: "Koli" },
+            { value: "Rulo", label: "Rulo" },
+            { value: "Konteyner (20ft FCL)", label: "Konteyner (20ft FCL)" },
+            { value: "Konteyner (40ft HC)", label: "Konteyner (40ft HC)" },
+            { value: "Adet", label: "Adet" }
         ],
-        materialLabel: "Hammadde / Polimer Tipi",
-        materialPlaceholder: "Hammadde tercihi seçiniz",
-        materialOptions: [
-            { value: "100% Virgin LDPE/HDPE", label: "100% Orijinal Polimer (Virgin LDPE/HDPE)" },
-            { value: "PCR Recycled Blend (30-50%)", label: "PCR Geri Dönüştürülmüş Karışım (%30 - %50)" },
-            { value: "100% Recycled Industrial", label: "100% Yüksek Mukavemetli Geri Dönüşümlü" }
-        ],
-        refHelp: "Talebiniz üretim ve ihracat birimimize ulaştı. 24 iş saati içinde resmi proforma teklif ve TDS teknik föy iletilecektir.",
-        copyBtn: "Referans Kodunu Kopyala",
-        copiedText: "Kopyalandı!"
+        bagSpecsTitle: "Çöp Poşeti Teknik Özellikleri (Ürün Yapısına Göre)",
+        dimensions: "Ölçü (En x Boy cm)",
+        dimensionsPh: "Örn: 80 x 110 cm veya 65 x 80 cm",
+        color: "Renk Tercihi",
+        colorPh: "Örn: Siyah, Mavi, Sarı, Şeffaf",
+        thickness: "Kalınlık (Mikron / µm)",
+        thicknessPh: "Örn: 45 µm LDPE veya 18 µm HDPE",
+        packaging: "Ambalaj / Rulo Tercihi",
+        packagingPh: "Örn: 10 yaprak x 20 rulo / Koli, Baskılı etiket",
+        sealType: "Dip Kesim / Bağlama Tipi",
+        sealTypes: ["Yıldız Dip (Star-Seal)", "Düz Dip (Flat-Seal)", "Büzgülü (Drawstring)", "C-Katlama", "Standart"],
+        deliveryLocation: "Teslimat Yeri (Liman / Şehir)",
+        deliveryLocationPh: "Örn: Hamburg Limanı, Almanya veya İstanbul"
     },
     en: {
-        gaugeLabel: "Target Thickness / Gauge",
-        gaugePlaceholder: "Select gauge (or detail in message)",
-        gaugeOptions: [
-            { value: "30-60 µm", label: "Standard Commercial (30 - 60 µm / 1.2 - 2.4 mil)" },
-            { value: "70-100 µm", label: "Heavy Duty Industrial (70 - 100 µm / 2.8 - 4.0 mil)" },
-            { value: "110-150 µm", label: "Extra Heavy Duty / Construction (110 - 150 µm)" },
-            { value: "Custom", label: "Custom Specification (Details in notes)" }
+        quantity: "Quantity / Order Volume",
+        unit: "Unit",
+        units: [
+            { value: "Ton", label: "Metric Tons (MT)" },
+            { value: "Koli", label: "Cartons / Cases" },
+            { value: "Rulo", label: "Rolls" },
+            { value: "Konteyner (20ft FCL)", label: "20ft FCL Container" },
+            { value: "Konteyner (40ft HC)", label: "40ft HC Container" },
+            { value: "Adet", label: "Pieces" }
         ],
-        materialLabel: "Raw Material & Polymer Blend",
-        materialPlaceholder: "Select polymer blend preference",
-        materialOptions: [
-            { value: "100% Virgin LDPE/HDPE", label: "100% Virgin LDPE / HDPE (High Tensile)" },
-            { value: "PCR Recycled Blend (30-50%)", label: "PCR Recycled Blend (30% - 50% Post-Consumer)" },
-            { value: "100% Recycled Industrial", label: "100% High-Grade Recycled Polymer" }
-        ],
-        refHelp: "Your request is registered with our export division. A formal commercial offer and TDS datasheet will be returned within 24 business hours.",
-        copyBtn: "Copy Reference Code",
-        copiedText: "Copied!"
+        bagSpecsTitle: "Garbage Bag Specifications (Dimensions, Color, Thickness & Packaging)",
+        dimensions: "Bag Dimensions (Width x Length cm)",
+        dimensionsPh: "e.g., 80 x 110 cm or 65 x 80 cm",
+        color: "Bag Color",
+        colorPh: "e.g., Black, Blue, Yellow, Clear",
+        thickness: "Thickness (Microns / µm)",
+        thicknessPh: "e.g., 45 µm LDPE or 18 µm HDPE",
+        packaging: "Packaging / Roll Configuration",
+        packagingPh: "e.g., 10 bags/roll, 20 rolls/carton, private label",
+        sealType: "Bottom Seal / Closure Type",
+        sealTypes: ["Star-Seal", "Flat-Seal", "Drawstring", "C-Fold", "Standard"],
+        deliveryLocation: "Delivery Port / City",
+        deliveryLocationPh: "e.g., Hamburg Port, Germany"
     },
     de: {
-        gaugeLabel: "Zielstärke / Folienstärke",
-        gaugePlaceholder: "Stärke wählen (oder Nachricht angeben)",
-        gaugeOptions: [
-            { value: "30-60 µm", label: "Standard Gewerblich (30 - 60 µm)" },
-            { value: "70-100 µm", label: "Schwerlast Industrie (70 - 100 µm)" },
-            { value: "110-150 µm", label: "Extra Schwer / Bau & Container (110 - 150 µm)" },
-            { value: "Custom", label: "Sonderanfertigung (Details im Freitext)" }
+        quantity: "Menge / Bestellvolumen",
+        unit: "Einheit",
+        units: [
+            { value: "Ton", label: "Tonnen (MT)" },
+            { value: "Koli", label: "Kartons" },
+            { value: "Rulo", label: "Rollen" },
+            { value: "Konteyner (20ft FCL)", label: "20ft FCL Container" },
+            { value: "Konteyner (40ft HC)", label: "40ft HC Container" }
         ],
-        materialLabel: "Rohstoff / Polymermischung",
-        materialPlaceholder: "Rohstoff wählen",
-        materialOptions: [
-            { value: "100% Virgin LDPE/HDPE", label: "100% Neuware LDPE / HDPE (Virgin)" },
-            { value: "PCR Recycled Blend (30-50%)", label: "PCR-Rezyklatanteil (30% - 50%)" },
-            { value: "100% Recycled Industrial", label: "100% Recyceltes Industriepolymer" }
-        ],
-        refHelp: "Ihre Anfrage ist eingegangen. Sie erhalten innerhalb von 24 Arbeitsstunden ein proforma Angebot und das technische Datenblatt (TDS).",
-        copyBtn: "Referenzcode kopieren",
-        copiedText: "Kopiert!"
+        bagSpecsTitle: "Müllbeutel-Spezifikationen (Maße, Farbe, Stärke & Verpackung)",
+        dimensions: "Abmessungen (Breite x Länge cm)",
+        dimensionsPh: "z.B. 80 x 110 cm",
+        color: "Farbe",
+        colorPh: "z.B. Schwarz, Blau, Gelb, Transparent",
+        thickness: "Materialstärke (Mikron / µm)",
+        thicknessPh: "z.B. 45 µm LDPE oder 18 µm HDPE",
+        packaging: "Verpackung / Rollenkonfiguration",
+        packagingPh: "z.B. 10 Beutel/Rolle, 20 Rollen/Karton",
+        sealType: "Bodenschweißung / Verschluss",
+        sealTypes: ["Sternboden (Star-Seal)", "Flachboden (Flat-Seal)", "Zugband (Drawstring)", "Standard"],
+        deliveryLocation: "Lieferort (Hafen / Stadt)",
+        deliveryLocationPh: "z.B. Hafen Hamburg, Deutschland"
     },
     fr: {
-        gaugeLabel: "Épaisseur / Micronnage Cible",
-        gaugePlaceholder: "Sélectionnez l'épaisseur souhaitée",
-        gaugeOptions: [
-            { value: "30-60 µm", label: "Standard Commercial (30 - 60 µm)" },
-            { value: "70-100 µm", label: "Haute Résistance Industriel (70 - 100 µm)" },
-            { value: "110-150 µm", label: "Extra Renforcé / Chantier (110 - 150 µm)" },
-            { value: "Custom", label: "Spécification Sur-Mesure" }
+        quantity: "Quantité / Volume",
+        unit: "Unité",
+        units: [
+            { value: "Ton", label: "Tonnes (MT)" },
+            { value: "Koli", label: "Cartons" },
+            { value: "Rulo", label: "Rouleaux" },
+            { value: "Konteyner (20ft FCL)", label: "Conteneur 20ft FCL" },
+            { value: "Konteyner (40ft HC)", label: "Conteneur 40ft HC" }
         ],
-        materialLabel: "Matière Première & Polymère",
-        materialPlaceholder: "Sélectionnez la matière",
-        materialOptions: [
-            { value: "100% Virgin LDPE/HDPE", label: "100% Polymère Vierge (LDPE / HDPE)" },
-            { value: "PCR Recycled Blend (30-50%)", label: "Mélange Recyclé PCR (30% - 50%)" },
-            { value: "100% Recycled Industrial", label: "100% Recyclé Haute Résistance" }
-        ],
-        refHelp: "Votre demande est prise en charge par notre bureau export. Une offre formelle et la fiche TDS vous seront remises sous 24 heures ouvrées.",
-        copyBtn: "Copier la Référence",
-        copiedText: "Copié !"
+        bagSpecsTitle: "Spécifications des Sacs Poubelle (Dimensions, Couleur, Épaisseur & Emballage)",
+        dimensions: "Dimensions (Largeur x Longueur cm)",
+        dimensionsPh: "ex. 80 x 110 cm",
+        color: "Couleur",
+        colorPh: "ex. Noir, Bleu, Jaune, Transparent",
+        thickness: "Épaisseur (Microns / µm)",
+        thicknessPh: "ex. 45 µm LDPE ou 18 µm HDPE",
+        packaging: "Conditionnement / Rouleaux",
+        packagingPh: "ex. 10 sacs/rouleau, 20 rouleaux/carton",
+        sealType: "Type de Soudure / Fermeture",
+        sealTypes: ["Soudure Étoile (Star-Seal)", "Soudure Plate", "Lien Coulissant", "Standard"],
+        deliveryLocation: "Lieu de Livraison (Port / Ville)",
+        deliveryLocationPh: "ex. Port de Marseille, France"
     },
     ar: {
-        gaugeLabel: "السماكة المستهدفة / الميكرون",
-        gaugePlaceholder: "اختر السماكة المطلوبة",
-        gaugeOptions: [
-            { value: "30-60 µm", label: "تجاري قياسي (30 - 60 ميكرون)" },
-            { value: "70-100 µm", label: "خدمة شاقة صناعية (70 - 100 ميكرون)" },
-            { value: "110-150 µm", label: "فائق المتانة للبناء والحاويات (110 - 150 ميكرون)" },
-            { value: "Custom", label: "مواصفات خاصة حسب الطلب" }
+        quantity: "الكمية المطلوبة",
+        unit: "الوحدة",
+        units: [
+            { value: "Ton", label: "طن متري" },
+            { value: "Koli", label: "كرتون" },
+            { value: "Rulo", label: "رول" },
+            { value: "Konteyner (20ft FCL)", label: "حاوية 20 قدم" },
+            { value: "Konteyner (40ft HC)", label: "حاوية 40 قدم" }
         ],
-        materialLabel: "المادة الخام ونوع البوليمر",
-        materialPlaceholder: "اختر نوع الخامة",
-        materialOptions: [
-            { value: "100% Virgin LDPE/HDPE", label: "100% بوليمر بكر (LDPE / HDPE)" },
-            { value: "PCR Recycled Blend (30-50%)", label: "مزيج معاد تدويره بعد الاستهلاك PCR (30% - 50%)" },
-            { value: "100% Recycled Industrial", label: "100% بوليمر صناعي معاد تدويره عالي القوة" }
-        ],
-        refHelp: "تم تسجيل طلبكم لدى قسم التصدير. سيتم إرسال عرض الأسعار الرسمي وبطاقة المواصفات TDS خلال 24 ساعة عمل.",
-        copyBtn: "نسخ رمز الطلب",
-        copiedText: "تم النسخ!"
+        bagSpecsTitle: "مواصفات أكياس القمامة (المقاس، اللون، السماكة والتعبئة)",
+        dimensions: "المقاس (العرض × الطول سم)",
+        dimensionsPh: "مثال: 80 × 110 سم",
+        color: "اللون",
+        colorPh: "مثال: أسود، أزرق، أصفر، شفاف",
+        thickness: "السماكة (ميكرون / µm)",
+        thicknessPh: "مثال: 45 ميكرون LDPE",
+        packaging: "تفضيل التعبئة والتغليف",
+        packagingPh: "مثال: 10 أكياس × 20 رول في الكرتون",
+        sealType: "نوع القاعدة / الإغلاق",
+        sealTypes: ["قاعدة نجمية (Star-Seal)", "قاعدة مسطحة", "رباط سحب", "قياسي"],
+        deliveryLocation: "مكان التسليم (الميناء / المدينة)",
+        deliveryLocationPh: "مثال: ميناء جدة أو الدار البيضاء"
     }
 };
 
@@ -137,30 +169,25 @@ export default function QuoteForm({
     presetProductId?: string;
 }) {
     const t = useI18n(locale);
-    const extra = FORM_EXTRA_TEXT[locale] || FORM_EXTRA_TEXT.en;
+    const sp = SPEC_LABELS[locale] || SPEC_LABELS.en!;
+    const presetProd = products.find((p) => p.id === presetProductId);
+    const defaultCategoryId = presetProd?.categoryId || (presetProductId && categories.some((c) => c.id === presetProductId) ? presetProductId : "");
+
     const [state, setState] = useState<"idle" | "sending" | "done" | "error" | "rate">("idle");
-    const [refCode, setRefCode] = useState("");
-    const [copied, setCopied] = useState(false);
+    const [ref, setRef] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
+    const [idempotencyKey] = useState(() => `rfq_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`);
 
     async function onSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        if (state === "sending") return;
         const form = e.currentTarget;
         const fd = new FormData(form);
         setState("sending");
         setErrorMsg("");
 
-        const gauge = String(fd.get("gauge") || "");
-        const material = String(fd.get("material") || "");
-        const rawMessage = String(fd.get("message") || "");
-
-        // Append structured technical specs to message for back-office review
-        const techSpecs = [
-            gauge ? `[Target Gauge: ${gauge}]` : "",
-            material ? `[Polymer Blend: ${material}]` : ""
-        ].filter(Boolean).join(" ");
-
-        const combinedMessage = techSpecs ? `${techSpecs}\n${rawMessage}`.trim() : rawMessage;
+        const quantity = String(fd.get("quantity") || "").trim();
+        const unit = String(fd.get("unit") || "Ton").trim();
 
         try {
             const res = await fetch("/api/quotes", {
@@ -174,76 +201,66 @@ export default function QuoteForm({
                     country: String(fd.get("country") || ""),
                     categoryId: String(fd.get("categoryId") || ""),
                     productId: String(fd.get("productId") || "") || null,
-                    volume: String(fd.get("volume") || ""),
+                    quantity,
+                    unit,
+                    volume: `${quantity} ${unit}`.trim(),
+                    bagSpecs: {
+                        dimensions: String(fd.get("dimensions") || ""),
+                        color: String(fd.get("color") || ""),
+                        thicknessMicron: String(fd.get("thicknessMicron") || ""),
+                        packagingPref: String(fd.get("packagingPref") || ""),
+                        sealType: String(fd.get("sealType") || "")
+                    },
                     deliveryTerm: String(fd.get("deliveryTerm") || "FOB"),
-                    message: combinedMessage,
+                    deliveryLocation: String(fd.get("deliveryLocation") || ""),
+                    message: String(fd.get("message") || ""),
+                    honeypot: String(fd.get("website_url") || ""),
+                    idempotencyKey,
                     locale,
                     sourcePage
                 })
             });
-            const data = (await res.json().catch(() => ({}))) as { id?: string; error?: string };
+            const data = (await res.json().catch(() => ({}))) as {
+                ok?: boolean;
+                id?: string;
+                requestNo?: string;
+                error?: string;
+            };
             if (res.status === 429) {
                 setState("rate");
                 return;
             }
-            if (!res.ok || !data.id) {
+            if (!res.ok || !data.ok || !data.id) {
                 setErrorMsg(data.error || t.forms.error);
                 setState("error");
                 return;
             }
-            const cleanId = (data.id || "").replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase() || "OK";
-            const generatedRef = `APL-2026-${locale.toUpperCase()}-${cleanId}`;
-            setRefCode(generatedRef);
+            setRef(data.requestNo || data.id.slice(0, 8).toUpperCase());
             setState("done");
             form.reset();
         } catch {
+            setErrorMsg(
+                locale === "tr"
+                    ? "Sunucu bağlantısı kurulamadı. Lütfen bağlantınızı kontrol edip tekrar deneyin."
+                    : t.forms.error
+            );
             setState("error");
-        }
-    }
-
-    function copyRef() {
-        if (!refCode) return;
-        if (typeof navigator !== "undefined" && navigator.clipboard) {
-            navigator.clipboard.writeText(refCode).then(() => {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2500);
-            });
         }
     }
 
     if (state === "done") {
         return (
-            <div className="card p-6 sm:p-8 border-emerald-500/40 bg-gradient-to-b from-emerald-50/50 to-white" role="status">
-                <div className="flex items-start gap-4">
-                    <span className="mt-1 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-emerald-600 text-xl font-bold text-white shadow-sm">✓</span>
-                    <div className="space-y-3">
-                        <div>
-                            <span className="inline-block text-xs font-black uppercase tracking-widest text-emerald-700">ASIAPLAST B2B RFQ</span>
-                            <h3 className="font-display text-xl font-black text-slate-900">
-                                {t.forms.successQuote}
-                            </h3>
-                        </div>
-
-                        <div className="inline-flex flex-wrap items-center gap-3 rounded-lg border border-emerald-200 bg-white px-4 py-2.5 shadow-sm">
-                            <span className="text-xs font-semibold text-slate-500">RFQ Reference:</span>
-                            <span className="font-mono text-base font-black text-emerald-800 tracking-wider">{refCode}</span>
-                            <button
-                                type="button"
-                                onClick={copyRef}
-                                className="ml-auto text-xs font-bold text-emerald-700 hover:text-emerald-900 underline"
-                            >
-                                {copied ? extra.copiedText : extra.copyBtn}
-                            </button>
-                        </div>
-
-                        <p className="text-sm text-slate-600 leading-relaxed">
-                            {extra.refHelp}
-                        </p>
-
-                        <div className="pt-2 text-xs text-slate-500 border-t border-emerald-100 flex flex-wrap gap-4">
-                            <span>Direct Email: <a href="mailto:export@asiaplast.com.tr" className="font-bold text-emerald-700">export@asiaplast.com.tr</a></span>
-                            <span>WhatsApp: <a href="https://wa.me/905336840175" target="_blank" rel="noopener noreferrer" className="font-bold text-emerald-700">+90 533 684 01 75</a></span>
-                        </div>
+            <div className="card p-6 sm:p-8" role="status">
+                <div className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-green-light text-lg text-brand-green-dark">
+                        ✓
+                    </span>
+                    <div>
+                        <h3 className="font-display text-lg font-bold text-brand-navy">
+                            {t.forms.successQuote}{" "}
+                            <span className="font-mono text-brand-green-dark">{ref}</span>
+                        </h3>
+                        <p className="mt-1 text-sm text-slate-500">{t.quote.lead}</p>
                     </div>
                 </div>
             </div>
@@ -263,86 +280,197 @@ export default function QuoteForm({
                 </p>
             )}
 
+            {/* Honeypot anti-spam field */}
+            <div className="hidden" aria-hidden="true">
+                <label htmlFor="q-website">Website</label>
+                <input id="q-website" name="website_url" tabIndex={-1} autoComplete="off" />
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                    <label className="label" htmlFor="q-name">{t.forms.name} *</label>
+                    <label className="label" htmlFor="q-name">
+                        {t.forms.name} *
+                    </label>
                     <input id="q-name" name="name" className="input" required autoComplete="name" />
                 </div>
                 <div>
-                    <label className="label" htmlFor="q-company">{t.forms.company} *</label>
+                    <label className="label" htmlFor="q-company">
+                        {t.forms.company} *
+                    </label>
                     <input id="q-company" name="company" className="input" required autoComplete="organization" />
                 </div>
                 <div>
-                    <label className="label" htmlFor="q-email">{t.forms.email} *</label>
+                    <label className="label" htmlFor="q-email">
+                        {t.forms.email} *
+                    </label>
                     <input id="q-email" name="email" type="email" className="input" required autoComplete="email" />
                 </div>
                 <div>
-                    <label className="label" htmlFor="q-phone">{t.forms.phone}</label>
+                    <label className="label" htmlFor="q-phone">
+                        {t.forms.phone}
+                    </label>
                     <input id="q-phone" name="phone" className="input" autoComplete="tel" />
                 </div>
                 <div>
-                    <label className="label" htmlFor="q-country">{t.forms.country} *</label>
+                    <label className="label" htmlFor="q-country">
+                        {t.forms.country} *
+                    </label>
                     <input id="q-country" name="country" className="input" required autoComplete="country-name" />
                 </div>
                 <div>
-                    <label className="label" htmlFor="q-category">{t.forms.productCategory} *</label>
-                    <select id="q-category" name="categoryId" className="input" required defaultValue="">
-                        <option value="" disabled>{t.forms.selectPlaceholder}</option>
+                    <label className="label" htmlFor="q-category">
+                        {t.forms.productCategory} *
+                    </label>
+                    <select id="q-category" name="categoryId" className="input" required defaultValue={defaultCategoryId}>
+                        <option value="" disabled>
+                            {t.forms.selectPlaceholder}
+                        </option>
                         {categories.map((c) => (
-                            <option key={c.id} value={c.id}>{c.name}</option>
+                            <option key={c.id} value={c.id}>
+                                {c.name}
+                            </option>
                         ))}
                     </select>
                 </div>
                 <div className="sm:col-span-2">
-                    <label className="label" htmlFor="q-product">{t.forms.productInterest}</label>
+                    <label className="label" htmlFor="q-product">
+                        {t.forms.productInterest}
+                    </label>
                     <select id="q-product" name="productId" className="input" defaultValue={presetProductId || ""}>
                         <option value="">{t.forms.selectPlaceholder}</option>
                         {products.map((p) => (
-                            <option key={p.id} value={p.id}>{p.name} — {p.category}</option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Technical Parameters */}
-                <div>
-                    <label className="label" htmlFor="q-gauge">{extra.gaugeLabel}</label>
-                    <select id="q-gauge" name="gauge" className="input" defaultValue="">
-                        <option value="">{extra.gaugePlaceholder}</option>
-                        {extra.gaugeOptions.map((opt) => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                        ))}
-                    </select>
-                </div>
-                <div>
-                    <label className="label" htmlFor="q-material">{extra.materialLabel}</label>
-                    <select id="q-material" name="material" className="input" defaultValue="">
-                        <option value="">{extra.materialPlaceholder}</option>
-                        {extra.materialOptions.map((opt) => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            <option key={p.id} value={p.id}>
+                                {p.name} — {p.category}
+                            </option>
                         ))}
                     </select>
                 </div>
 
                 <div>
-                    <label className="label" htmlFor="q-volume">{t.forms.volume} *</label>
-                    <input id="q-volume" name="volume" className="input" required placeholder={t.quote.volumePlaceholder} />
+                    <label className="label" htmlFor="q-quantity">
+                        {sp.quantity} *
+                    </label>
+                    <input
+                        id="q-quantity"
+                        name="quantity"
+                        className="input"
+                        required
+                        placeholder={t.quote.volumePlaceholder || "Örn: 15"}
+                    />
                 </div>
                 <div>
-                    <label className="label" htmlFor="q-term">{t.forms.deliveryTerm} *</label>
+                    <label className="label" htmlFor="q-unit">
+                        {sp.unit} *
+                    </label>
+                    <select id="q-unit" name="unit" className="input" required defaultValue="Ton">
+                        {sp.units.map((u) => (
+                            <option key={u.value} value={u.value}>
+                                {u.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Garbage bag technical specification block */}
+                <div className="sm:col-span-2 rounded-xl border border-surface-border bg-surface-muted/60 p-4">
+                    <p className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-navy">
+                        {sp.bagSpecsTitle}
+                    </p>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                        <div>
+                            <label className="label" htmlFor="q-dimensions">
+                                {sp.dimensions}
+                            </label>
+                            <input
+                                id="q-dimensions"
+                                name="dimensions"
+                                className="input"
+                                placeholder={sp.dimensionsPh}
+                            />
+                        </div>
+                        <div>
+                            <label className="label" htmlFor="q-color">
+                                {sp.color}
+                            </label>
+                            <input id="q-color" name="color" className="input" placeholder={sp.colorPh} />
+                        </div>
+                        <div>
+                            <label className="label" htmlFor="q-thickness">
+                                {sp.thickness}
+                            </label>
+                            <input
+                                id="q-thickness"
+                                name="thicknessMicron"
+                                className="input"
+                                placeholder={sp.thicknessPh}
+                            />
+                        </div>
+                        <div>
+                            <label className="label" htmlFor="q-seal">
+                                {sp.sealType}
+                            </label>
+                            <select id="q-seal" name="sealType" className="input" defaultValue="">
+                                <option value="">{t.forms.selectPlaceholder}</option>
+                                {sp.sealTypes.map((st) => (
+                                    <option key={st} value={st}>
+                                        {st}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="sm:col-span-2">
+                            <label className="label" htmlFor="q-packaging">
+                                {sp.packaging}
+                            </label>
+                            <input
+                                id="q-packaging"
+                                name="packagingPref"
+                                className="input"
+                                placeholder={sp.packagingPh}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label className="label" htmlFor="q-term">
+                        {t.forms.deliveryTerm} *
+                    </label>
                     <select id="q-term" name="deliveryTerm" className="input" required defaultValue="FOB">
                         {DELIVERY_TERMS.map((term) => (
-                            <option key={term} value={term}>{term}</option>
+                            <option key={term} value={term}>
+                                {term}
+                            </option>
                         ))}
                     </select>
                 </div>
+                <div>
+                    <label className="label" htmlFor="q-location">
+                        {sp.deliveryLocation}
+                    </label>
+                    <input
+                        id="q-location"
+                        name="deliveryLocation"
+                        className="input"
+                        placeholder={sp.deliveryLocationPh}
+                    />
+                </div>
+
                 <div className="sm:col-span-2">
-                    <label className="label" htmlFor="q-message">{t.forms.message}</label>
-                    <textarea id="q-message" name="message" rows={3} className="input" placeholder={t.quote.volumePlaceholder === "" ? "" : undefined} />
+                    <label className="label" htmlFor="q-message">
+                        {t.forms.message}
+                    </label>
+                    <textarea id="q-message" name="message" rows={4} className="input" />
                 </div>
             </div>
 
             <label className="mt-4 flex items-start gap-2.5 text-xs text-slate-500">
-                <input type="checkbox" name="consent" required className="mt-0.5 h-4 w-4 rounded border-surface-border text-brand-green focus:ring-brand-green/30" />
+                <input
+                    type="checkbox"
+                    name="consent"
+                    required
+                    className="mt-0.5 h-4 w-4 rounded border-surface-border text-brand-green focus:ring-brand-green/30"
+                />
                 {t.forms.consent}
             </label>
 

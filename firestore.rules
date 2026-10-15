@@ -1,8 +1,5 @@
 rules_version = '2';
 
-// ASIAPLAST — ajansonline project
-// All public content is rendered server-side via the Admin SDK (bypasses rules).
-// Clients may NOT read or write business data directly. Forms POST to /api/*.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -10,43 +7,191 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isAdmin() {
-      return isSignedIn() && request.auth.token.admin == true;
+    function isAsiaplastAdmin() {
+      return isSignedIn() && (
+        request.auth.token.admin == true ||
+        request.auth.token.asiaplastAdmin == true ||
+        exists(/databases/$(database)/documents/asiaplast_admins/$(request.auth.uid))
+      );
     }
 
-    // Business collections — admin-only via custom claims.
+    // ====================================================
+    // ASIAPLAST EXCLUSIVE COLLECTIONS (Server + Admin RBAC)
+    // ====================================================
+    match /asiaplast_messages/{id} {
+      allow read, update, delete: if isAsiaplastAdmin();
+      allow create: if false; // Created strictly via server /api/contact (Admin SDK)
+    }
+
+    match /asiaplast_quotes/{id} {
+      allow read, update, delete: if isAsiaplastAdmin();
+      allow create: if false; // Created strictly via server /api/quotes (Admin SDK)
+    }
+
+    match /asiaplast_orders/{id} {
+      allow read, write: if isAsiaplastAdmin();
+    }
+
+    match /asiaplast_products/{id} {
+      allow read: if isAsiaplastAdmin();
+      allow write: if isAsiaplastAdmin();
+    }
+
+    match /asiaplast_slug_redirects/{id} {
+      allow read: if isAsiaplastAdmin();
+      allow write: if isAsiaplastAdmin();
+    }
+
+    match /asiaplast_settings/{id} {
+      allow read, write: if isAsiaplastAdmin();
+    }
+
+    match /asiaplast_visits/{id} {
+      allow read: if isAsiaplastAdmin();
+      allow write: if false; // Recorded strictly via server /api/analytics/collect
+    }
+
+    match /asiaplast_login_logs/{id} {
+      allow read: if isAsiaplastAdmin();
+      allow write: if false; // Recorded strictly server-side
+    }
+
+    match /asiaplast_audit_logs/{id} {
+      allow read, create: if isAsiaplastAdmin();
+      allow update, delete: if false;
+    }
+
+    match /asiaplast_admins/{uid} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || isAsiaplastAdmin());
+      allow write: if false; // Managed strictly on server via Admin SDK
+    }
+
+    // Legacy unprefixed AsiaPlast rules (admin-only)
     match /contactMessages/{id} {
-      allow read, update, delete: if isAdmin();
-      allow create: if false; // created only by /api/contact (Admin SDK)
+      allow read, update, delete: if isAsiaplastAdmin();
+      allow create: if false;
     }
-
     match /quoteRequests/{id} {
-      allow read, update, delete: if isAdmin();
-      allow create: if false; // created only by /api/quotes (Admin SDK)
+      allow read, update, delete: if isAsiaplastAdmin();
+      allow create: if false;
+    }
+    match /orders/{id}      { allow read, write: if isAsiaplastAdmin(); }
+    match /orderEvents/{id} { allow read, write: if isAsiaplastAdmin(); }
+    match /products/{id}    { allow read, write: if isAsiaplastAdmin(); }
+
+    // ====================================================
+    // SHARED AJANSONLINE PROJECT COLLECTIONS (Preserved)
+    // ====================================================
+    match /ad_configs/{adId} {
+      allow read: if true;
+      allow write: if request.auth != null;
     }
 
-    match /orders/{id}        { allow read, write: if isAdmin(); }
-    match /orderEvents/{id}   { allow read, write: if isAdmin(); }
-    match /customers/{id}     { allow read, write: if isAdmin(); }
-    match /distributors/{id}  { allow read, write: if isAdmin(); }
-    match /products/{id}      { allow read: if isAdmin(); allow write: if isAdmin(); }
-    match /categories/{id}    { allow read: if isAdmin(); allow write: if isAdmin(); }
-    match /blogPosts/{id}     { allow read, write: if isAdmin(); }
-    match /pages/{id}         { allow read, write: if isAdmin(); }
-    match /seoSettings/{id}   { allow read, write: if isAdmin(); }
-    match /mediaAssets/{id}   { allow read, write: if isAdmin(); }
-    match /notifications/{id} { allow read, write: if isAdmin(); }
-    match /auditLogs/{id}     { allow read, create: if isAdmin(); allow update, delete: if false; }
-    match /settings/{id}      { allow read, write: if isAdmin(); }
-    match /visitorSessions/{id} { allow read, write: if isAdmin(); }
-    match /loginLogs/{id}     { allow read, write: if isAdmin(); }
+    match /news/{newsId} {
+      allow read: if true;
+      allow create, delete: if request.auth != null;
+      allow update: if (request.auth != null)
+                    || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount']));
 
-    match /users/{uid} {
-      allow read: if isSignedIn() && request.auth.uid == uid;
-      allow write: if false; // claims managed by Admin SDK scripts only
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if request.resource.data.keys().hasAll(['author', 'content'])
+                      && request.resource.data.author is string
+                      && request.resource.data.content is string
+                      && request.resource.data.author.size() > 0
+                      && request.resource.data.content.size() > 0
+                      && request.resource.data.content.size() < 2000;
+        allow update, delete: if request.auth != null;
+      }
     }
 
-    // Deny everything else.
+    match /authors/{authorId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+
+    match /comments/{commentId} {
+      allow read: if request.auth != null;
+      allow create: if request.resource.data.keys().hasAll(['author', 'content', 'newsId'])
+                    && request.resource.data.author is string
+                    && request.resource.data.content is string;
+      allow update, delete: if request.auth != null;
+    }
+
+    match /settings/{section} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /newsletter/{subscriberId} {
+      allow read: if request.auth != null;
+      allow create: if request.resource.data.keys().hasAll(['email'])
+                    && request.resource.data.email is string
+                    && request.resource.data.email.matches('.*@.*\\..*');
+      allow update, delete: if request.auth != null;
+    }
+
+    match /analytics/{dateId} {
+      allow read: if request.auth != null;
+      allow create, update: if true;
+    }
+
+    match /messages/{msgId} {
+      allow create: if request.resource.data.keys().hasAll(['name','email','content','subject','createdAt','read','folder'])
+                    && request.resource.data.name is string
+                    && request.resource.data.email is string
+                    && request.resource.data.content is string;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    match /user_news/{newsId} {
+      allow create: if false;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    match /polls/{pollId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+
+    match /poll_votes/{voteId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /rate_limits/{bucketId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /audit_logs/{logId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /client_logs/{logId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    match /visitor_sessions/{sessionId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    match /admins/{adminId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // NILASYA GLOBAL EXCLUSIVE COLLECTIONS (Preserved)
+    match /nilasya_contacts/{id} { allow read, write: if false; }
+    match /nilasya_rfqs/{id} { allow read, write: if false; }
+    match /nilasya_containers/{id} { allow read, write: if false; }
+    match /nilasya_stocks/{id} { allow read, write: if false; }
+    match /nilasya_audit/{id} { allow read, write: if false; }
+    match /nilasya_analytics_visits/{id} { allow read, write: if false; }
+    match /nilasya_analytics_events/{id} { allow read, write: if false; }
+    match /nilasya_analytics_pages/{id} { allow read, write: if false; }
+    match /nilasya_login_logs/{id} { allow read, write: if false; }
+    match /nilasya_web_sessions/{id} { allow read, write: if false; }
+
+    // Default deny for all other collections
     match /{document=**} {
       allow read, write: if false;
     }

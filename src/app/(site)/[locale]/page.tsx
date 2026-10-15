@@ -11,7 +11,7 @@ import { getIndustries } from "@/lib/i18n/content";
 import { localeOrDefault } from "@/lib/i18n/requireLocale";
 import { buildMetadata, organizationJsonLd, faqJsonLd, breadcrumbJsonLd, localePath } from "@/lib/seo";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;

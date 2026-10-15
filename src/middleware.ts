@@ -17,11 +17,18 @@ export function middleware(request: NextRequest) {
     const segments = pathname.split("/").filter(Boolean);
     const first = segments[0] || "";
 
+    const hostHeader = request.headers.get("host") || "";
+    const isLocalLoopbackIp = hostHeader.startsWith("127.0.0.1");
+
     if (first === DEFAULT) {
         const url = request.nextUrl.clone();
         url.pathname = `/${segments.slice(1).join("/")}` || "/";
         if (url.pathname === "") url.pathname = "/";
         url.search = search;
+        if (isLocalLoopbackIp) {
+            const redirectUrl = new URL(`${url.pathname}${url.search}`, `http://${hostHeader}`);
+            return NextResponse.redirect(redirectUrl, 308);
+        }
         return NextResponse.redirect(url, 308);
     }
 
@@ -36,11 +43,15 @@ export function middleware(request: NextRequest) {
     url.search = search;
     const headers = new Headers(request.headers);
     headers.set("x-locale", DEFAULT);
+    if (isLocalLoopbackIp) {
+        const rewriteUrl = new URL(`${url.pathname}${url.search}`, `http://${hostHeader}`);
+        return withLocale(request, DEFAULT, NextResponse.rewrite(rewriteUrl, { request: { headers } }));
+    }
     return withLocale(request, DEFAULT, NextResponse.rewrite(url, { request: { headers } }));
 }
 
 export const config = {
     matcher: [
-        "/((?!admin|api|_next|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|icon|apple-icon|opengraph-image|twitter-image|.*\\.).*)"
+        "/((?!dashboard|admin|api|_next|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|icon|apple-icon|opengraph-image|twitter-image|.*\\.).*)"
     ]
 };

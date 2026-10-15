@@ -21,7 +21,8 @@ const manrope = Manrope({
 const notoArabic = Noto_Sans_Arabic({
     subsets: ["arabic"],
     variable: "--font-arabic",
-    display: "swap"
+    display: "swap",
+    preload: false
 });
 
 export const viewport: Viewport = {

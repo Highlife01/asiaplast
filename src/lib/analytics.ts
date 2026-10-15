@@ -1,623 +1,492 @@
-import "server-only";
-import { FieldValue, Timestamp } from "firebase-admin/firestore";
-import { db, COLLECTIONS } from "./firebaseAdmin";
-import { parseUserAgent, resolveGeoLocation, type DeviceInfo, type GeoLocation } from "./geoDeviceParser";
+export type DeviceType = "telefon" | "tablet" | "bilgisayar" | "Bilinmiyor";
+export type BotClassification = "human" | "bot" | "uncertain";
 
-export type VisitedPage = {
-    path: string;
-    title?: string;
-    visitedAt: string;
-    timeSpentSeconds?: number;
-};
-
-export type VisitorEvent = {
-    type: "pageview" | "heartbeat" | "conversion";
-    path: string;
-    timestamp: string;
-    details?: string;
-};
-
-export type VisitorSessionDoc = {
-    id: string;
-    sessionId: string;
-    firstSeenAt: string;
-    lastSeenAt: string;
-    durationSeconds: number;
-    pageCount: number;
-    entryPage: string;
-    lastPage: string;
-    visitedPages: VisitedPage[];
-    referrer: string;
-    utm: {
-        source?: string;
-        medium?: string;
-        campaign?: string;
-        term?: string;
-        content?: string;
-    };
-    country: string;
-    countryCode: string;
-    region: string;
-    city: string;
-    timezone: string;
-    isApproximateLocation: boolean;
-    deviceType: "telefon" | "tablet" | "bilgisayar" | "bot";
+export interface ParsedUserAgent {
+    deviceType: DeviceType;
     deviceBrand: string;
     deviceModel: string;
-    os: string;
-    browser: string;
-    browserLanguage: string;
-    screenResolution: string;
-    isBot: boolean;
-    botName: string | null;
-    hasConversion: boolean;
-    conversionType: "none" | "rfq" | "contact" | "both";
-    conversionRefId?: string | null;
-    events: VisitorEvent[];
-    createdAt: Timestamp;
-    updatedAt: Timestamp;
-};
+    osName: string;
+    osVersion: string;
+    browserName: string;
+    browserVersion: string;
+    botStatus: BotClassification;
+    botReason: string;
+}
 
-export type LoginLogDoc = {
-    id: string;
-    email: string;
-    success: boolean;
-    failureReason?: string | null;
-    country: string;
+export interface GeoLocationInfo {
+    countryCode: string;
+    countryName: string;
+    region: string;
     city: string;
-    deviceType: "telefon" | "tablet" | "bilgisayar";
-    os: string;
-    browser: string;
-    timestamp: Timestamp;
-    isoTime: string;
+    source: string;
+}
+
+const COUNTRY_NAMES_TR: Record<string, string> = {
+    TR: "Türkiye",
+    US: "Amerika Birleşik Devletleri",
+    DE: "Almanya",
+    GB: "Birleşik Krallık",
+    FR: "Fransa",
+    IT: "İtalya",
+    ES: "İspanya",
+    NL: "Hollanda",
+    RU: "Rusya",
+    AE: "Birleşik Arap Emirlikleri",
+    SA: "Suudi Arabistan",
+    IQ: "Irak",
+    QA: "Katar",
+    KW: "Kuveyt",
+    EG: "Mısır",
+    MA: "Fas",
+    DZ: "Cezayir",
+    TN: "Tunus",
+    LY: "Libya",
+    NG: "Nijerya",
+    GH: "Gana",
+    KE: "Kenya",
+    ZA: "Güney Afrika",
+    CN: "Çin",
+    JP: "Japonya",
+    KR: "Güney Kore",
+    IN: "Hindistan",
+    MY: "Malezya",
+    SG: "Singapur",
+    ID: "Endonezya",
+    AZ: "Azerbaycan",
+    GE: "Gürcistan",
+    UA: "Ukrayna",
+    RO: "Romanya",
+    BG: "Bulgaristan",
+    GR: "Yunanistan",
+    PL: "Polonya",
+    BE: "Belçika",
+    AT: "Avusturya",
+    CH: "İsviçre",
+    SE: "İsveç",
+    NO: "Norveç",
+    DK: "Danimarka",
+    CA: "Kanada",
+    BR: "Brezilya",
+    MX: "Meksika",
+    AU: "Avustralya"
 };
 
-// 1. Record visitor pageview / event
-export async function recordVisitorEvent(params: {
-    sessionId: string;
-    path: string;
-    title?: string;
-    referrer?: string;
-    utm?: {
-        source?: string;
-        medium?: string;
-        campaign?: string;
-        term?: string;
-        content?: string;
-    };
-    screenResolution?: string;
-    browserLanguage?: string;
-    userAgent: string;
-    ip: string;
-    headers?: Headers | Record<string, string | string[] | undefined>;
-}): Promise<void> {
-    const {
-        sessionId,
-        path,
-        title,
-        referrer,
-        utm,
-        screenResolution,
-        browserLanguage,
-        userAgent,
-        ip,
-        headers
-    } = params;
+const KNOWN_BOT_PATTERNS: { pattern: RegExp; label: string }[] = [
+    { pattern: /googlebot|google-extended|adsbot-google|apis-google/i, label: "Googlebot" },
+    { pattern: /bingbot|msnbot|adidxbot/i, label: "Bingbot" },
+    { pattern: /gptbot|oai-searchbot|chatgpt-user/i, label: "OpenAI Bot" },
+    { pattern: /claudebot|anthropic-ai/i, label: "ClaudeBot" },
+    { pattern: /perplexitybot/i, label: "PerplexityBot" },
+    { pattern: /applebot/i, label: "Applebot" },
+    { pattern: /yandexbot|yandexmobilebot/i, label: "YandexBot" },
+    { pattern: /duckduckbot/i, label: "DuckDuckBot" },
+    { pattern: /baiduspider/i, label: "Baiduspider" },
+    { pattern: /facebookexternalhit|meta-externalagent/i, label: "Meta Crawler" },
+    { pattern: /twitterbot/i, label: "Twitterbot" },
+    { pattern: /linkedinbot/i, label: "LinkedInBot" },
+    { pattern: /ahrefsbot/i, label: "AhrefsBot" },
+    { pattern: /semrushbot/i, label: "SemrushBot" },
+    { pattern: /mj12bot/i, label: "MJ12bot" },
+    { pattern: /petalbot/i, label: "PetalBot" },
+    { pattern: /headlesschrome|puppeteer|playwright|selenium|phantomjs/i, label: "Headless Tarayıcı" },
+    {
+        pattern: /\b(curl|wget|python-requests|python-urllib|go-http-client|node-fetch|libwww-perl|scrapy)\b/i,
+        label: "HTTP İstemci Betiği"
+    }
+];
 
-    const nowIso = new Date().toISOString();
-    const docRef = db().collection(COLLECTIONS.visitorSessions).doc(sessionId);
-    const existingSnap = await docRef.get();
+const ANDROID_BRAND_PREFIXES: { pattern: RegExp; brand: string }[] = [
+    { pattern: /^(SM-|GT-|SCH-|SGH-|SHV-|SC-)/i, brand: "Samsung" },
+    { pattern: /^Pixel\b/i, brand: "Google" },
+    { pattern: /^(Redmi|Mi\b|POCO|M20|M21|210|220|221|230|231|240)/i, brand: "Xiaomi" },
+    { pattern: /^(HUAWEI|VOG-|ELE-|ANA-|ELS-|NOH-|lya-|mar-|stk-)/i, brand: "Huawei" },
+    { pattern: /^(CPH\d|RMX\d|OPPO)/i, brand: "OPPO / Realme" },
+    { pattern: /^(V2\d{3}|vivo)/i, brand: "Vivo" },
+    { pattern: /^(ONEPLUS|KB20|LE21|NE22|CPH24)/i, brand: "OnePlus" },
+    { pattern: /^(moto\b|XT\d{4})/i, brand: "Motorola" },
+    { pattern: /^(ASUS_|AI22|ZS6)/i, brand: "Asus" },
+    { pattern: /^(LM-|LG-)/i, brand: "LG" },
+    { pattern: /^(XQ-|SOV\d|SO-\d)/i, brand: "Sony" },
+    { pattern: /^Infinix/i, brand: "Infinix" },
+    { pattern: /^TECNO/i, brand: "Tecno" }
+];
 
-    if (!existingSnap.exists) {
-        // Resolve Geo & Device info on first event
-        const geo: GeoLocation = await resolveGeoLocation(ip, headers);
-        const device: DeviceInfo = parseUserAgent(userAgent);
+function cleanHint(value: string | null | undefined): string {
+    if (!value) return "";
+    return value.replace(/^"+|"+$/g, "").trim();
+}
 
-        const newDoc: Omit<VisitorSessionDoc, "id"> = {
-            sessionId,
-            firstSeenAt: nowIso,
-            lastSeenAt: nowIso,
-            durationSeconds: 0,
-            pageCount: 1,
-            entryPage: path,
-            lastPage: path,
-            visitedPages: [
-                {
-                    path,
-                    title: title || path,
-                    visitedAt: nowIso,
-                    timeSpentSeconds: 0
-                }
-            ],
-            referrer: referrer && referrer !== "undefined" ? referrer : "Doğrudan Trafik (Direct)",
-            utm: utm || {},
-            country: geo.country,
-            countryCode: geo.countryCode,
-            region: geo.region,
-            city: geo.city,
-            timezone: geo.timezone,
-            isApproximateLocation: geo.isApproximate,
-            deviceType: device.deviceType,
-            deviceBrand: device.deviceBrand,
-            deviceModel: device.deviceModel,
-            os: device.os,
-            browser: device.browser,
-            browserLanguage: browserLanguage || "Bilinmiyor",
-            screenResolution: screenResolution || "Veri alınamadı",
-            isBot: device.isBot,
-            botName: device.botName,
-            hasConversion: false,
-            conversionType: "none",
-            conversionRefId: null,
-            events: [
-                {
-                    type: "pageview",
-                    path,
-                    timestamp: nowIso,
-                    details: title
-                }
-            ],
-            createdAt: FieldValue.serverTimestamp() as unknown as Timestamp,
-            updatedAt: FieldValue.serverTimestamp() as unknown as Timestamp
+function inferBrandFromModel(model: string): string {
+    for (const item of ANDROID_BRAND_PREFIXES) {
+        if (item.pattern.test(model)) return item.brand;
+    }
+    return "Bilinmiyor";
+}
+
+export function parseUserAgentAndHints(
+    rawUa: string | null | undefined,
+    headers?: {
+        secChUa?: string | null;
+        secChUaMobile?: string | null;
+        secChUaPlatform?: string | null;
+        secChUaPlatformVersion?: string | null;
+        secChUaModel?: string | null;
+        acceptLanguage?: string | null;
+    },
+    clientHintModel?: string | null,
+    clientHintPlatformVersion?: string | null
+): ParsedUserAgent {
+    const ua = (rawUa || "").trim();
+    if (!ua) {
+        return {
+            deviceType: "Bilinmiyor",
+            deviceBrand: "Bilinmiyor",
+            deviceModel: "Model belirlenemedi",
+            osName: "Bilinmiyor",
+            osVersion: "Bilinmiyor",
+            browserName: "Bilinmiyor",
+            browserVersion: "Bilinmiyor",
+            botStatus: "uncertain",
+            botReason: "User-Agent başlığı gönderilmedi"
         };
-
-        await docRef.set(newDoc);
-    } else {
-        const existing = existingSnap.data() as VisitorSessionDoc;
-        const firstTime = new Date(existing.firstSeenAt).getTime();
-        const durationSec = Math.max(0, Math.round((Date.now() - firstTime) / 1000));
-
-        // Deduplicate rapid refresh on exact same path within 3 seconds
-        const lastPage = existing.visitedPages?.[existing.visitedPages.length - 1];
-        const isDuplicateReload =
-            lastPage &&
-            lastPage.path === path &&
-            Date.now() - new Date(lastPage.visitedAt).getTime() < 3000;
-
-        let visitedPages = existing.visitedPages || [];
-        if (!isDuplicateReload) {
-            visitedPages = [
-                ...visitedPages,
-                {
-                    path,
-                    title: title || path,
-                    visitedAt: nowIso,
-                    timeSpentSeconds: 0
-                }
-            ].slice(-50); // limit to last 50 pages to keep document compact
-        }
-
-        const events = [
-            ...(existing.events || []),
-            {
-                type: "pageview" as const,
-                path,
-                timestamp: nowIso,
-                details: isDuplicateReload ? "Yenileme (Reload)" : title
-            }
-        ].slice(-100);
-
-        await docRef.update({
-            lastSeenAt: nowIso,
-            lastPage: path,
-            durationSeconds: durationSec,
-            pageCount: visitedPages.length,
-            visitedPages,
-            events,
-            updatedAt: FieldValue.serverTimestamp()
-        });
     }
-}
 
-// 2. Record visitor heartbeat (periodic duration ping)
-export async function recordVisitorHeartbeat(sessionId: string, currentPath: string): Promise<void> {
-    if (!sessionId) return;
-    const docRef = db().collection(COLLECTIONS.visitorSessions).doc(sessionId);
-    const existingSnap = await docRef.get();
-    if (!existingSnap.exists) return;
+    // 1. Bot classification
+    let botStatus: BotClassification = "human";
+    let botReason = "Standart tarayıcı imzası";
 
-    const existing = existingSnap.data() as VisitorSessionDoc;
-    const nowIso = new Date().toISOString();
-    const firstTime = new Date(existing.firstSeenAt).getTime();
-    const durationSec = Math.max(0, Math.round((Date.now() - firstTime) / 1000));
-
-    // Update last visited page time spent
-    const visitedPages = existing.visitedPages || [];
-    if (visitedPages.length > 0) {
-        const last = visitedPages[visitedPages.length - 1];
-        if (last.path === currentPath) {
-            const pageStart = new Date(last.visitedAt).getTime();
-            last.timeSpentSeconds = Math.max(0, Math.round((Date.now() - pageStart) / 1000));
+    for (const item of KNOWN_BOT_PATTERNS) {
+        if (item.pattern.test(ua)) {
+            botStatus = "bot";
+            botReason = `Bilinen bot imzası: ${item.label}`;
+            break;
         }
     }
 
-    await docRef.update({
-        lastSeenAt: nowIso,
-        durationSeconds: durationSec,
-        visitedPages,
-        updatedAt: FieldValue.serverTimestamp()
-    });
+    if (botStatus === "human") {
+        if (/\b(bot|crawler|spider|slurp|archiver|ia_archiver)\b/i.test(ua)) {
+            botStatus = "bot";
+            botReason = "Genel tarayıcı bot imzası";
+        } else if (
+            /\b(axios|okhttp|java\/|apache-httpclient|postmanruntime|insomnia|got\s*\()\b/i.test(ua) ||
+            (!/mozilla\/5\.0/i.test(ua) && !headers?.acceptLanguage)
+        ) {
+            botStatus = "uncertain";
+            botReason = "Standart dışı istemci veya eksik dil başlığı (kesin değil)";
+        }
+    }
+
+    // 2. OS & Version
+    let osName = "Bilinmiyor";
+    let osVersion = "Bilinmiyor";
+
+    const hintPlatform = cleanHint(headers?.secChUaPlatform);
+    const hintPlatformVer = cleanHint(clientHintPlatformVersion || headers?.secChUaPlatformVersion);
+
+    if (/iPhone|iPod/i.test(ua)) {
+        osName = "iOS";
+        const m = ua.match(/OS (\d+[_\d]*)/i);
+        if (m?.[1]) osVersion = m[1].replace(/_/g, ".");
+    } else if (/iPad/i.test(ua)) {
+        osName = "iPadOS";
+        const m = ua.match(/OS (\d+[_\d]*)/i);
+        if (m?.[1]) osVersion = m[1].replace(/_/g, ".");
+    } else if (/Android/i.test(ua)) {
+        osName = "Android";
+        const m = ua.match(/Android\s+([0-9.]+)/i);
+        if (hintPlatformVer && hintPlatformVer !== "0.0.0") {
+            osVersion = hintPlatformVer;
+        } else if (m?.[1]) {
+            osVersion = m[1];
+        }
+    } else if (/Windows NT/i.test(ua) || hintPlatform === "Windows") {
+        osName = "Windows";
+        const ntMatch = ua.match(/Windows NT\s+([0-9.]+)/i);
+        if (hintPlatformVer) {
+            const major = Number(hintPlatformVer.split(".")[0]);
+            if (major >= 13) osVersion = "11";
+            else if (major > 0) osVersion = "10";
+            else osVersion = "10/11";
+        } else if (ntMatch?.[1]) {
+            const nt = ntMatch[1];
+            if (nt === "10.0") osVersion = "10/11";
+            else if (nt === "6.3") osVersion = "8.1";
+            else if (nt === "6.2") osVersion = "8";
+            else if (nt === "6.1") osVersion = "7";
+            else osVersion = nt;
+        }
+    } else if (/Macintosh|Mac OS X/i.test(ua) || hintPlatform === "macOS") {
+        osName = "macOS";
+        const m = ua.match(/Mac OS X\s+([0-9_]+)/i);
+        if (hintPlatformVer && hintPlatformVer !== "0.0.0") {
+            osVersion = hintPlatformVer;
+        } else if (m?.[1]) {
+            const candidate = m[1].replace(/_/g, ".");
+            osVersion = candidate === "10.15.7" ? "10.15+ (Tarayıcı Kısıtlı)" : candidate;
+        }
+    } else if (/CrOS/i.test(ua) || hintPlatform === "Chrome OS") {
+        osName = "ChromeOS";
+    } else if (/Linux/i.test(ua) || hintPlatform === "Linux") {
+        osName = "Linux";
+    }
+
+    // 3. Browser & Version
+    let browserName = "Bilinmiyor";
+    let browserVersion = "Bilinmiyor";
+
+    const edg = ua.match(/Edg(?:e|A|iOS)?\/([0-9.]+)/);
+    const opr = ua.match(/(?:OPR|Opera)\/([0-9.]+)/);
+    const samsung = ua.match(/SamsungBrowser\/([0-9.]+)/);
+    const yandex = ua.match(/YaBrowser\/([0-9.]+)/);
+    const crios = ua.match(/CriOS\/([0-9.]+)/);
+    const fxios = ua.match(/FxiOS\/([0-9.]+)/);
+    const firefox = ua.match(/Firefox\/([0-9.]+)/);
+    const chrome = ua.match(/Chrome\/([0-9.]+)/);
+    const safariVer = ua.match(/Version\/([0-9.]+).*Safari\//);
+
+    if (edg) {
+        browserName = "Microsoft Edge";
+        browserVersion = edg[1];
+    } else if (opr) {
+        browserName = "Opera";
+        browserVersion = opr[1];
+    } else if (samsung) {
+        browserName = "Samsung Internet";
+        browserVersion = samsung[1];
+    } else if (yandex) {
+        browserName = "Yandex Browser";
+        browserVersion = yandex[1];
+    } else if (crios) {
+        browserName = "Chrome (iOS)";
+        browserVersion = crios[1];
+    } else if (fxios) {
+        browserName = "Firefox (iOS)";
+        browserVersion = fxios[1];
+    } else if (firefox) {
+        browserName = "Firefox";
+        browserVersion = firefox[1];
+    } else if (chrome && !/Chromium/i.test(ua)) {
+        browserName = "Chrome";
+        browserVersion = chrome[1];
+    } else if (safariVer || (/Safari\//i.test(ua) && !/Chrome|Chromium/i.test(ua))) {
+        browserName = "Safari";
+        browserVersion = safariVer?.[1] || "Bilinmiyor";
+    }
+
+    // 4. Device Type, Brand & Model
+    // ACCURACY RULE: Never guess phone models (especially iPhone) from screen resolution.
+    // If browser does not provide exact model via UA or Client Hints, return "Model belirlenemedi".
+    let deviceType: DeviceType = "bilgisayar";
+    let deviceBrand = "Bilinmiyor";
+    let deviceModel = "Model belirlenemedi";
+
+    const isTabletUa = /iPad|Tablet|PlayBook|Silk|(Android(?!.*Mobile))/i.test(ua);
+    const isMobileUa =
+        /Mobile|iPhone|iPod|Android.*Mobile|Windows Phone|BlackBerry|IEMobile|Opera Mini/i.test(ua) ||
+        headers?.secChUaMobile === "?1";
+
+    if (isTabletUa) {
+        deviceType = "tablet";
+    } else if (isMobileUa) {
+        deviceType = "telefon";
+    } else if (osName === "Windows" || osName === "macOS" || osName === "Linux" || osName === "ChromeOS") {
+        deviceType = "bilgisayar";
+    } else if (botStatus === "bot") {
+        deviceType = "Bilinmiyor";
+    }
+
+    const rawHintModel = cleanHint(clientHintModel || headers?.secChUaModel);
+
+    if (/iPhone/i.test(ua)) {
+        deviceBrand = "Apple";
+        // iOS Safari & WebKit never expose specific iPhone hardware models in UA or Client Hints
+        deviceModel = "Model belirlenemedi";
+    } else if (/iPad/i.test(ua)) {
+        deviceBrand = "Apple";
+        deviceModel = "Model belirlenemedi";
+    } else if (/Macintosh|Mac OS X/i.test(ua)) {
+        deviceBrand = "Apple";
+        deviceModel = "Model belirlenemedi";
+    } else if (rawHintModel && rawHintModel !== "K" && rawHintModel.toLowerCase() !== "unknown") {
+        deviceModel = rawHintModel.slice(0, 80);
+        deviceBrand = inferBrandFromModel(deviceModel);
+    } else if (/Android/i.test(ua)) {
+        const androidMatch = ua.match(/Android\s+[0-9.]+;\s*([^;)]+?)(?:\s+Build\/[^)]*)?\)/i);
+        const token = androidMatch?.[1]?.trim() || "";
+        // Chrome UA reduction uses "K" placeholder when high-entropy hints are not sent
+        if (token && token !== "K" && !/^(Linux|U|wv|en-[A-Z]{2}|tr-[A-Z]{2}|Mobile)$/i.test(token)) {
+            deviceModel = token.slice(0, 80);
+            deviceBrand = inferBrandFromModel(deviceModel);
+        } else {
+            deviceModel = "Model belirlenemedi";
+        }
+    }
+
+    return {
+        deviceType,
+        deviceBrand,
+        deviceModel,
+        osName,
+        osVersion,
+        browserName,
+        browserVersion,
+        botStatus,
+        botReason
+    };
 }
 
-// 3. Mark session conversion on form submission
-export async function markSessionConversion(
-    sessionId: string | null | undefined,
-    type: "rfq" | "contact",
-    refId: string
-): Promise<void> {
-    if (!sessionId) return;
+export function extractGeoFromHeaders(headers: Headers): GeoLocationInfo {
+    const appEngineCountry = headers.get("x-appengine-country")?.trim().toUpperCase();
+    const cfCountry = headers.get("cf-ipcountry")?.trim().toUpperCase();
+    const vercelCountry = headers.get("x-vercel-ip-country")?.trim().toUpperCase();
+    const fastlyCountry = headers.get("fastly-geo-country")?.trim().toUpperCase();
+    const customCountry = headers.get("x-country-code")?.trim().toUpperCase();
+
+    const rawCode = appEngineCountry || cfCountry || vercelCountry || fastlyCountry || customCountry || "";
+    const validCode =
+        /^[A-Z]{2}$/.test(rawCode) && rawCode !== "ZZ" && rawCode !== "XX" && rawCode !== "T1" ? rawCode : "";
+
+    const source = appEngineCountry
+        ? "Google Cloud / Firebase Hosting"
+        : cfCountry
+        ? "Cloudflare Edge"
+        : vercelCountry
+        ? "Edge Geo Header"
+        : fastlyCountry
+        ? "Fastly CDN Geo"
+        : validCode
+        ? "Sunucu Konum Başlığı"
+        : "Yerel / Doğrulanmış Başlık Yok";
+
+    const rawRegion =
+        headers.get("x-appengine-region")?.trim() ||
+        headers.get("x-vercel-ip-country-region")?.trim() ||
+        headers.get("cf-region")?.trim() ||
+        "";
+    const rawCity =
+        headers.get("x-appengine-city")?.trim() ||
+        headers.get("x-vercel-ip-city")?.trim() ||
+        headers.get("cf-ipcity")?.trim() ||
+        "";
+
+    const decodeSafe = (val: string) => {
+        if (!val || val === "?" || val.toLowerCase() === "unknown" || val.toLowerCase() === "zz") return "Bilinmiyor";
+        try {
+            return decodeURIComponent(val).slice(0, 80);
+        } catch {
+            return val.slice(0, 80);
+        }
+    };
+
+    const countryCode = validCode || "Bilinmiyor";
+    const countryName = validCode ? `${COUNTRY_NAMES_TR[validCode] || validCode} (${validCode})` : "Bilinmiyor";
+
+    return {
+        countryCode,
+        countryName,
+        region: decodeSafe(rawRegion),
+        city: decodeSafe(rawCity),
+        source
+    };
+}
+
+const SENSITIVE_QUERY_KEYS = new Set([
+    "password",
+    "pass",
+    "pwd",
+    "token",
+    "access_token",
+    "refresh_token",
+    "id_token",
+    "secret",
+    "key",
+    "api_key",
+    "apikey",
+    "otp",
+    "code",
+    "session",
+    "sid",
+    "email",
+    "phone",
+    "tel",
+    "message",
+    "company",
+    "contactname"
+]);
+
+export function sanitizeReferrer(rawReferrer: string | null | undefined, ownHost?: string): string {
+    if (!rawReferrer || typeof rawReferrer !== "string") return "Doğrudan Giriş";
+    const trimmed = rawReferrer.trim();
+    if (!trimmed) return "Doğrudan Giriş";
     try {
-        const docRef = db().collection(COLLECTIONS.visitorSessions).doc(sessionId);
-        const snap = await docRef.get();
-        if (!snap.exists) return;
-
-        const data = snap.data() as VisitorSessionDoc;
-        const currentType = data.conversionType || "none";
-        const newType =
-            currentType === "none"
-                ? type
-                : currentType === type
-                ? type
-                : "both";
-
-        const nowIso = new Date().toISOString();
-        const events = [
-            ...(data.events || []),
-            {
-                type: "conversion" as const,
-                path: data.lastPage || "/quote",
-                timestamp: nowIso,
-                details: `${type === "rfq" ? "Teklif/Sipariş Formu" : "İletişim Mesajı"} gönderildi (Ref: ${refId})`
-            }
-        ].slice(-100);
-
-        await docRef.update({
-            hasConversion: true,
-            conversionType: newType,
-            conversionRefId: refId,
-            events,
-            updatedAt: FieldValue.serverTimestamp()
-        });
+        const parsed = new URL(trimmed);
+        if (ownHost && parsed.host.toLowerCase() === ownHost.toLowerCase()) {
+            return "Site İçi Geçiş";
+        }
+        const cleanPath = parsed.pathname && parsed.pathname !== "/" ? parsed.pathname.slice(0, 80) : "";
+        return `${parsed.origin}${cleanPath}`.slice(0, 160);
     } catch {
-        // Non-blocking
+        return "Bilinmiyor";
     }
 }
 
-// 4. Record login attempts (successful and failed)
-export async function recordLoginAttempt(params: {
-    email: string;
-    success: boolean;
-    failureReason?: string;
-    ip: string;
-    userAgent: string;
-    headers?: Headers | Record<string, string | string[] | undefined>;
-}): Promise<void> {
-    const { email, success, failureReason, ip, userAgent, headers } = params;
-    const nowIso = new Date().toISOString();
-    const geo = await resolveGeoLocation(ip, headers);
-    const device = parseUserAgent(userAgent);
-
-    await db().collection(COLLECTIONS.loginLogs).add({
-        email: email.trim().toLowerCase(),
-        success,
-        failureReason: failureReason || null,
-        country: geo.country,
-        city: geo.city,
-        deviceType: device.deviceType === "bot" ? "bilgisayar" : device.deviceType,
-        os: device.os,
-        browser: device.browser,
-        timestamp: FieldValue.serverTimestamp(),
-        isoTime: nowIso
-    });
+export interface UtmInfo {
+    utmSource: string;
+    utmMedium: string;
+    utmCampaign: string;
+    utmTerm: string;
+    utmContent: string;
 }
 
-// 5. Query visitor sessions with filtering and aggregation
-export type AnalyticsFilter = {
-    dateRange?: "today" | "7d" | "30d" | "all";
-    country?: string;
-    deviceType?: string;
-    browser?: string;
-    conversionStatus?: "all" | "converted" | "unconverted";
-    includeBots?: boolean;
-    page?: number;
-    pageSize?: number;
-};
-
-export type AnalyticsReport = {
-    totalSessions: number;
-    totalVisits: number;
-    uniqueVisitors: number;
-    activeVisitors: number;
-    conversionCount: number;
-    conversionRate: number;
-    windowMinutesForActive: number;
-    measurementNotes: {
-        uniqueVisitorsMethod: string;
-        activeVisitorsMethod: string;
-        ipGeoNote: string;
+export function extractSafeUtm(rawQuery: Record<string, unknown> | null | undefined): UtmInfo {
+    const clean = (val: unknown) => {
+        if (typeof val !== "string") return "";
+        const trimmed = val.trim().slice(0, 100);
+        if (trimmed.includes("@")) return "[Maskelendi]";
+        return trimmed;
     };
-    breakdowns: {
-        countries: { name: string; count: number; percentage: number }[];
-        devices: { name: string; count: number; percentage: number }[];
-        operatingSystems: { name: string; count: number; percentage: number }[];
-        browsers: { name: string; count: number; percentage: number }[];
-        trafficSources: { name: string; count: number; percentage: number }[];
-        topPages: { path: string; count: number; percentage: number }[];
-    };
-    sessions: VisitorSessionDoc[];
-    pagination: {
-        currentPage: number;
-        pageSize: number;
-        totalPages: number;
-        totalRecords: number;
-    };
-};
-
-export async function queryAnalyticsReport(filter: AnalyticsFilter = {}): Promise<AnalyticsReport> {
-    const pageSize = Math.min(100, Math.max(10, filter.pageSize || 20));
-    const currentPage = Math.max(1, filter.page || 1);
-
-    // Fetch records (Firestore query)
-    const snap = await db()
-        .collection(COLLECTIONS.visitorSessions)
-        .orderBy("createdAt", "desc")
-        .limit(1000)
-        .get();
-
-    const now = Date.now();
-    const ACTIVE_WINDOW_MS = 15 * 60 * 1000; // 15 minutes activity window
-
-    // In-memory filter pipeline on retrieved real records
-    let allRecords: VisitorSessionDoc[] = snap.docs.map((d) => {
-        const data = d.data();
-        return {
-            id: d.id,
-            sessionId: data.sessionId || d.id,
-            firstSeenAt: data.firstSeenAt || "",
-            lastSeenAt: data.lastSeenAt || "",
-            durationSeconds: data.durationSeconds || 0,
-            pageCount: data.pageCount || 1,
-            entryPage: data.entryPage || "/",
-            lastPage: data.lastPage || "/",
-            visitedPages: data.visitedPages || [],
-            referrer: data.referrer || "Doğrudan Trafik",
-            utm: data.utm || {},
-            country: data.country || "Bilinmiyor",
-            countryCode: data.countryCode || "Bilinmiyor",
-            region: data.region || "Bilinmiyor",
-            city: data.city || "Bilinmiyor",
-            timezone: data.timezone || "UTC",
-            isApproximateLocation: data.isApproximateLocation ?? true,
-            deviceType: data.deviceType || "bilgisayar",
-            deviceBrand: data.deviceBrand || "Bilinmiyor",
-            deviceModel: data.deviceModel || "Model belirlenemedi",
-            os: data.os || "Bilinmiyor",
-            browser: data.browser || "Bilinmiyor",
-            browserLanguage: data.browserLanguage || "Bilinmiyor",
-            screenResolution: data.screenResolution || "Veri alınamadı",
-            isBot: Boolean(data.isBot),
-            botName: data.botName || null,
-            hasConversion: Boolean(data.hasConversion),
-            conversionType: data.conversionType || "none",
-            conversionRefId: data.conversionRefId || null,
-            events: data.events || [],
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt
-        } as VisitorSessionDoc;
-    });
-
-    // 1. Bot filter
-    if (!filter.includeBots) {
-        allRecords = allRecords.filter((r) => !r.isBot && r.deviceType !== "bot");
-    }
-
-    // 2. Date range filter
-    if (filter.dateRange && filter.dateRange !== "all") {
-        let maxAgeMs = 30 * 86400000;
-        if (filter.dateRange === "today") maxAgeMs = 86400000;
-        else if (filter.dateRange === "7d") maxAgeMs = 7 * 86400000;
-        allRecords = allRecords.filter((r) => {
-            const time = new Date(r.firstSeenAt).getTime();
-            return !isNaN(time) && now - time <= maxAgeMs;
-        });
-    }
-
-    // 3. Country filter
-    if (filter.country && filter.country !== "all") {
-        allRecords = allRecords.filter((r) => r.country.toLowerCase() === filter.country!.toLowerCase());
-    }
-
-    // 4. Device filter
-    if (filter.deviceType && filter.deviceType !== "all") {
-        allRecords = allRecords.filter((r) => r.deviceType === filter.deviceType);
-    }
-
-    // 5. Browser filter
-    if (filter.browser && filter.browser !== "all") {
-        allRecords = allRecords.filter((r) => r.browser.toLowerCase().startsWith(filter.browser!.toLowerCase()));
-    }
-
-    // 6. Conversion filter
-    if (filter.conversionStatus === "converted") {
-        allRecords = allRecords.filter((r) => r.hasConversion);
-    } else if (filter.conversionStatus === "unconverted") {
-        allRecords = allRecords.filter((r) => !r.hasConversion);
-    }
-
-    // Aggregations based on real filtered records
-    const totalSessions = allRecords.length;
-    let totalVisits = 0;
-    let conversionCount = 0;
-    let activeVisitors = 0;
-    const uniqueVisitorIds = new Set<string>();
-
-    const countryCounts: Record<string, number> = {};
-    const deviceCounts: Record<string, number> = {};
-    const osCounts: Record<string, number> = {};
-    const browserCounts: Record<string, number> = {};
-    const sourceCounts: Record<string, number> = {};
-    const pageCounts: Record<string, number> = {};
-
-    for (const record of allRecords) {
-        totalVisits += record.pageCount || 1;
-        uniqueVisitorIds.add(record.sessionId);
-        if (record.hasConversion) conversionCount++;
-
-        // Active check: lastSeenAt within last 15 mins
-        const lastSeen = new Date(record.lastSeenAt).getTime();
-        if (!isNaN(lastSeen) && now - lastSeen <= ACTIVE_WINDOW_MS) {
-            activeVisitors++;
-        }
-
-        // Breakdowns
-        countryCounts[record.country] = (countryCounts[record.country] || 0) + 1;
-        deviceCounts[record.deviceType] = (deviceCounts[record.deviceType] || 0) + 1;
-        osCounts[record.os] = (osCounts[record.os] || 0) + 1;
-        const mainBrowser = record.browser.split(" ")[0] || "Bilinmiyor";
-        browserCounts[mainBrowser] = (browserCounts[mainBrowser] || 0) + 1;
-
-        const src = record.utm?.source
-            ? `UTM: ${record.utm.source}`
-            : record.referrer?.includes("http")
-            ? new URL(record.referrer).hostname
-            : record.referrer || "Doğrudan";
-        sourceCounts[src] = (sourceCounts[src] || 0) + 1;
-
-        // Pages
-        for (const p of record.visitedPages || []) {
-            pageCounts[p.path] = (pageCounts[p.path] || 0) + 1;
-        }
-    }
-
-    const conversionRate = totalSessions > 0 ? Number(((conversionCount / totalSessions) * 100).toFixed(1)) : 0;
-
-    const toSortedArray = (counts: Record<string, number>, total: number) =>
-        Object.entries(counts)
-            .map(([name, count]) => ({
-                name,
-                count,
-                percentage: total > 0 ? Number(((count / total) * 100).toFixed(1)) : 0
-            }))
-            .sort((a, b) => b.count - a.count);
-
-    // Pagination
-    const totalRecords = allRecords.length;
-    const totalPages = Math.ceil(totalRecords / pageSize) || 1;
-    const startIndex = (currentPage - 1) * pageSize;
-    const paginatedSessions = allRecords.slice(startIndex, startIndex + pageSize);
-
     return {
-        totalSessions,
-        totalVisits,
-        uniqueVisitors: uniqueVisitorIds.size,
-        activeVisitors,
-        conversionCount,
-        conversionRate,
-        windowMinutesForActive: 15,
-        measurementNotes: {
-            uniqueVisitorsMethod: "Birinci taraf oturum belirteci (ap_visitor_session) bazında ölçülmüştür. Cihaz parmak izi kullanılmaz.",
-            activeVisitorsMethod: "Son 15 dakika içerisinde sayfada doğrulanmış etkinlik veya heartbeat kaydı bulunan oturumlar.",
-            ipGeoNote: "IP konumu sunucu tarafında yaklaşık olarak belirlenmiştir; VPN, proxy veya kurumsal ağlar gerçek konumu değiştirebilir."
-        },
-        breakdowns: {
-            countries: toSortedArray(countryCounts, totalSessions).slice(0, 10),
-            devices: toSortedArray(deviceCounts, totalSessions),
-            operatingSystems: toSortedArray(osCounts, totalSessions).slice(0, 10),
-            browsers: toSortedArray(browserCounts, totalSessions).slice(0, 10),
-            trafficSources: toSortedArray(sourceCounts, totalSessions).slice(0, 10),
-            topPages: toSortedArray(pageCounts, totalVisits)
-                .slice(0, 10)
-                .map((p) => ({ path: p.name, count: p.count, percentage: p.percentage }))
-        },
-        sessions: paginatedSessions,
-        pagination: {
-            currentPage,
-            pageSize,
-            totalPages,
-            totalRecords
-        }
+        utmSource: clean(rawQuery?.utm_source),
+        utmMedium: clean(rawQuery?.utm_medium),
+        utmCampaign: clean(rawQuery?.utm_campaign),
+        utmTerm: clean(rawQuery?.utm_term),
+        utmContent: clean(rawQuery?.utm_content)
     };
 }
 
-// 6. Query login logs with pagination
-export async function queryLoginLogs(page = 1, pageSize = 20): Promise<{
-    logs: LoginLogDoc[];
-    pagination: { currentPage: number; pageSize: number; totalPages: number; totalRecords: number };
-}> {
-    const snap = await db()
-        .collection(COLLECTIONS.loginLogs)
-        .orderBy("timestamp", "desc")
-        .limit(200)
-        .get();
-
-    const allLogs: LoginLogDoc[] = snap.docs.map((d) => {
-        const data = d.data();
-        return {
-            id: d.id,
-            email: data.email || "",
-            success: Boolean(data.success),
-            failureReason: data.failureReason || null,
-            country: data.country || "Bilinmiyor",
-            city: data.city || "Bilinmiyor",
-            deviceType: data.deviceType || "bilgisayar",
-            os: data.os || "Bilinmiyor",
-            browser: data.browser || "Bilinmiyor",
-            timestamp: data.timestamp,
-            isoTime: data.isoTime || (data.timestamp ? data.timestamp.toDate().toISOString() : "")
-        };
-    });
-
-    const totalRecords = allLogs.length;
-    const totalPages = Math.ceil(totalRecords / pageSize) || 1;
-    const startIndex = (page - 1) * pageSize;
-    const logs = allLogs.slice(startIndex, startIndex + pageSize);
-
-    return {
-        logs,
-        pagination: {
-            currentPage: page,
-            pageSize,
-            totalPages,
-            totalRecords
+export function sanitizePathForAnalytics(rawPath: string | null | undefined): string {
+    if (!rawPath || typeof rawPath !== "string") return "/";
+    try {
+        const base = "https://example.invalid";
+        const url = new URL(rawPath.startsWith("/") ? rawPath : `/${rawPath}`, base);
+        for (const key of Array.from(url.searchParams.keys())) {
+            if (SENSITIVE_QUERY_KEYS.has(key.toLowerCase()) || !key.toLowerCase().startsWith("utm_")) {
+                url.searchParams.delete(key);
+            }
         }
-    };
+        return url.pathname.slice(0, 180) || "/";
+    } catch {
+        return rawPath.split("?")[0]?.slice(0, 180) || "/";
+    }
 }
 
-// 7. Cleanup retention (e.g., purge sessions older than 90 days)
-export async function cleanExpiredAnalytics(retentionDays = 90): Promise<{ deletedSessions: number; deletedLogins: number }> {
-    const cutoffDate = new Date(Date.now() - retentionDays * 86400000);
-    const cutoffIso = cutoffDate.toISOString();
+export function formatDurationTr(seconds: number): string {
+    const safe = Number.isFinite(seconds) && seconds > 0 ? Math.round(seconds) : 0;
+    if (safe === 0) return "Tek etkinlik (0 sn)";
+    if (safe < 60) return `${safe} sn`;
+    const mins = Math.floor(safe / 60);
+    const remSec = safe % 60;
+    if (mins < 60) {
+        return remSec > 0 ? `${mins} dk ${remSec} sn` : `${mins} dk`;
+    }
+    const hours = Math.floor(mins / 60);
+    const remMins = mins % 60;
+    return remMins > 0 ? `${hours} sa ${remMins} dk` : `${hours} sa`;
+}
 
-    let deletedSessions = 0;
-    let deletedLogins = 0;
-
-    // Purge visitor sessions
-    const sessionSnap = await db()
-        .collection(COLLECTIONS.visitorSessions)
-        .where("firstSeenAt", "<", cutoffIso)
-        .limit(200)
-        .get();
-
-    const batch1 = db().batch();
-    sessionSnap.docs.forEach((doc) => {
-        batch1.delete(doc.ref);
-        deletedSessions++;
-    });
-    if (deletedSessions > 0) await batch1.commit();
-
-    // Purge login logs
-    const loginSnap = await db()
-        .collection(COLLECTIONS.loginLogs)
-        .where("timestamp", "<", Timestamp.fromDate(cutoffDate))
-        .limit(200)
-        .get();
-
-    const batch2 = db().batch();
-    loginSnap.docs.forEach((doc) => {
-        batch2.delete(doc.ref);
-        deletedLogins++;
-    });
-    if (deletedLogins > 0) await batch2.commit();
-
-    return { deletedSessions, deletedLogins };
+export function maskEmail(email: string | null | undefined): string {
+    if (!email || !email.includes("@")) return email || "Bilinmiyor";
+    const [local, domain] = email.split("@");
+    if (local.length <= 2) return `${local[0] || "*"}***@${domain}`;
+    return `${local.slice(0, 2)}***${local.slice(-1)}@${domain}`;
 }

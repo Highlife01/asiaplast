@@ -41,11 +41,11 @@ export async function POST(request: Request) {
         }
 
         const bag = await getSessionBag();
-        if (bag.consent !== "all") {
+        if (bag.consent === "necessary") {
             return NextResponse.json({
                 ok: true,
                 tracked: false,
-                reason: "CONSENT_NOT_GRANTED"
+                reason: "CONSENT_OPTED_OUT"
             });
         }
 

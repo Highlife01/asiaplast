@@ -34,12 +34,32 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
     metadataBase: new URL(SITE_URL),
+    applicationName: "ASIAPLAST",
     title: {
-        default: "ASIAPLAST — Global Garbage Bags Manufacturer",
+        default: "ASIAPLAST — Global Garbage Bags & Industrial Bin Liners Manufacturer",
         template: "%s — ASIAPLAST"
     },
     description:
-        "Wholesale garbage bags, industrial bin liners and private-label packaging for international buyers.",
+        "Wholesale garbage bags, heavy-duty refuse sacks, drawstring rolls, industrial bin liners and private-label polyethylene packaging manufacturer & exporter.",
+    keywords: [
+        "ASIAPLAST",
+        "AsiaPlast Plastik",
+        "asiaplastik.com.tr",
+        "garbage bags manufacturer",
+        "industrial bin liners",
+        "heavy duty refuse sacks",
+        "drawstring trash bags",
+        "star seal garbage bags",
+        "private label garbage bags",
+        "toptan çöp poşeti üreticisi",
+        "endüstriyel çöp torbası",
+        "ihracat çöp poşeti",
+        "Müllbeutel Hersteller",
+        "sacs poubelle grossiste"
+    ],
+    authors: [{ name: "ASIAPLAST", url: SITE_URL }],
+    creator: "ASIAPLAST",
+    publisher: "ASIAPLAST",
     manifest: "/manifest.webmanifest",
     appleWebApp: {
         capable: true,
@@ -49,6 +69,29 @@ export const metadata: Metadata = {
     icons: {
         icon: "/icon.svg",
         apple: "/icons/icon-192.svg"
+    },
+    openGraph: {
+        type: "website",
+        siteName: "ASIAPLAST",
+        url: SITE_URL,
+        title: "ASIAPLAST — Global Garbage Bags & Industrial Bin Liners Manufacturer",
+        description:
+            "Wholesale garbage bags, heavy-duty refuse sacks, drawstring rolls, industrial bin liners and private-label polyethylene packaging manufacturer & exporter.",
+        images: [
+            {
+                url: `${SITE_URL}/og-image.svg`,
+                width: 1200,
+                height: 630,
+                alt: "ASIAPLAST — Global Garbage Bags Manufacturer"
+            }
+        ]
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "ASIAPLAST — Global Garbage Bags & Industrial Bin Liners Manufacturer",
+        description:
+            "Wholesale garbage bags, heavy-duty refuse sacks, drawstring rolls, industrial bin liners and private-label polyethylene packaging manufacturer & exporter.",
+        images: [`${SITE_URL}/og-image.svg`]
     }
 };
 

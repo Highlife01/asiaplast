@@ -9,11 +9,11 @@ type Props = {
 };
 
 const MESSAGES: Partial<Record<Locale, string>> = {
-    tr: "Merhaba ASIAPLAST, asiaplast.web.app web siteniz üzerinden ulaşıyorum. Toptan çöp poşeti ve ihracat ürünleriniz hakkında detaylı bilgi ve fiyat teklifi almak istiyorum.",
-    en: "Hello ASIAPLAST, I am reaching out via your website asiaplast.web.app. I would like to inquire about your wholesale garbage bags and request an export quotation.",
-    de: "Hallo ASIAPLAST, ich kontaktiere Sie über Ihre Website asiaplast.web.app. Ich interessiere mich für Ihre Müllbeutel im Großhandel und möchte ein Exportangebot anfordern.",
-    fr: "Bonjour ASIAPLAST, je vous contacte depuis votre site web asiaplast.web.app. Je souhaiterais obtenir des informations et un devis export pour vos sacs poubelle en gros.",
-    ar: "مرحباً آسيا بلاست (ASIAPLAST)، أتواصل معكم عبر موقعكم الإلكتروني asiaplast.web.app. أود الاستفسار عن أكياس النفايات بالجملة وطلب عرض أسعار للتصدير."
+    tr: "Merhaba ASIAPLAST, www.asiaplastik.com.tr web siteniz üzerinden ulaşıyorum. Toptan çöp poşeti ve ihracat ürünleriniz hakkında detaylı bilgi ve fiyat teklifi almak istiyorum.",
+    en: "Hello ASIAPLAST, I am reaching out via your website www.asiaplastik.com.tr. I would like to inquire about your wholesale garbage bags and request an export quotation.",
+    de: "Hallo ASIAPLAST, ich kontaktiere Sie über Ihre Website www.asiaplastik.com.tr. Ich interessiere mich für Ihre Müllbeutel im Großhandel und möchte ein Exportangebot anfordern.",
+    fr: "Bonjour ASIAPLAST, je vous contacte depuis votre site web www.asiaplastik.com.tr. Je souhaiterais obtenir des informations et un devis export pour vos sacs poubelle en gros.",
+    ar: "مرحباً آسيا بلاست (ASIAPLAST)، أتواصل معكم عبر موقعكم الإلكتروني www.asiaplastik.com.tr. أود الاستفسار عن أكياس النفايات بالجملة وطلب عرض أسعار للتصدير."
 };
 
 const BADGES: Partial<Record<Locale, { desk: string; status: string }>> = {
@@ -29,7 +29,7 @@ export default function WhatsAppButton({ locale, phoneNumber = "905336840175" }:
     const cleanNumber = phoneNumber.replace(/\D/g, "");
 
     const whatsappUrl = useMemo(() => {
-        const text = MESSAGES[locale] || MESSAGES.en || "Hello ASIAPLAST, I am reaching out via your website asiaplast.web.app.";
+        const text = MESSAGES[locale] || MESSAGES.en || "Hello ASIAPLAST, I am reaching out via your website www.asiaplastik.com.tr.";
         return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
     }, [cleanNumber, locale]);
 

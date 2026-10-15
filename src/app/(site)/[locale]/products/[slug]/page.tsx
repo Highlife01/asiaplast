@@ -31,11 +31,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         });
     }
     const dict = getDictionary(l);
+    const fallbackImage =
+        product.categoryId === "heavy-duty"
+            ? "/images/products/heavy-duty.jpg"
+            : product.categoryId === "household"
+            ? "/images/products/household.jpg"
+            : product.categoryId === "industrial-liners"
+            ? "/images/products/industrial-liners.jpg"
+            : product.categoryId === "drawstring"
+            ? "/images/products/drawstring.jpg"
+            : product.categoryId === "colored"
+            ? "/images/products/colored.jpg"
+            : product.categoryId === "private-label"
+            ? "/images/products/private-label.jpg"
+            : "/images/products/star-seal.jpg";
+
     return buildMetadata({
         title: `${product.name} — ${dict.hero.badge}`,
         description: product.shortDescription,
-        path: `/products/${slug}`,
-        locale: l
+        path: `/products/${product.slug}`,
+        locale: l,
+        ogImage: product.imageUrl || fallbackImage
     });
 }
 
@@ -83,7 +99,15 @@ export default async function ProductDetailPage({ params }: Props) {
 
     return (
         <>
-            <JsonLd data={productJsonLd({ name: product.name, description: product.shortDescription, slug: product.slug, locale: l })} />
+            <JsonLd
+                data={productJsonLd({
+                    name: product.name,
+                    description: product.shortDescription,
+                    slug: product.slug,
+                    image: imageUrl,
+                    locale: l
+                })}
+            />
             <JsonLd
                 data={breadcrumbJsonLd([
                     { name: dict.nav.home, path: localePath(l, "/") },

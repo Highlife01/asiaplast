@@ -336,7 +336,7 @@ const privacy: Record<Active, LegalPage> = {
             { heading: "Purpose & Legal Grounds", text: "Data is processed strictly to prepare B2B commercial quotations, verify technical extrusion parameters, issue proforma invoices, and fulfill delivery orders under legitimate business interest and contractual performance." },
             { heading: "Analytics & Session Cookies", text: "We use a single first-party HttpOnly __session cookie for admin authentication and anonymous first-party visit statistics. We do not use localStorage, sessionStorage, IndexedDB, third-party advertising trackers, or device fingerprinting." },
             { heading: "Data Retention & Security", text: "Records are stored in secure cloud systems for commercial and fiscal audit compliance periods, after which they are systematically deleted or anonymized." },
-            { heading: "Your Rights & Contact", text: "You may exercise your rights of access, rectification, or deletion by contacting export@asiaplast.com.tr or writing to our Global Export Office at Dünya Ticaret Merkezi, A-2 Blok Kat: 9, Bakırköy / İstanbul." }
+            { heading: "Your Rights & Contact", text: "You may exercise your rights of access, rectification, or deletion by contacting export@asiaplastik.com.tr or writing to our Global Export Office at Dünya Ticaret Merkezi, A-2 Blok Kat: 9, Bakırköy / İstanbul." }
         ]
     },
     tr: {
@@ -348,7 +348,7 @@ const privacy: Record<Active, LegalPage> = {
             { heading: "İşleme Amacı ve Hukuki Sebepler", text: "Veriler; B2B teklif ve proforma fatura düzenlenmesi, teknik üretim fizibilitesi yapılması ve sözleşme süreçlerinin yürütülmesi amaçlarıyla KVKK 5/2 maddesi kapsamında meşru menfaat ve sözleşmenin ifası hukuki sebepleriyle işlenir." },
             { heading: "Analitik ve Oturum Çerezleri", text: "Yönetim paneli kimlik doğrulaması ve anonim birinci taraf ziyaret istatistikleri için tek bir HttpOnly __session çerezi kullanılır. localStorage, sessionStorage, IndexedDB, üçüncü taraf reklam izleyicileri veya cihaz parmak izi kullanılmaz." },
             { heading: "Saklama Süresi ve Güvenlik", text: "Toplanan ticari talep kayıtları, yasal zamanaşımı ve ticari arşiv süreleri boyunca güvenli sunucularda saklanır; sürenin bitiminde imha edilir veya anonim hale getirilir." },
-            { heading: "Haklarınız ve Başvuru", text: "KVKK'nın 11. maddesi kapsamındaki haklarınızı export@asiaplast.com.tr e-posta adresimiz üzerinden veya DTM Bakırköy / İstanbul İhracat Ofisimize yazılı olarak başvurarak kullanabilirsiniz." }
+            { heading: "Haklarınız ve Başvuru", text: "KVKK'nın 11. maddesi kapsamındaki haklarınızı export@asiaplastik.com.tr e-posta adresimiz üzerinden veya DTM Bakırköy / İstanbul İhracat Ofisimize yazılı olarak başvurarak kullanabilirsiniz." }
         ]
     },
     de: {
@@ -360,7 +360,7 @@ const privacy: Record<Active, LegalPage> = {
             { heading: "Zweck und Rechtsgrundlage", text: "Die Datenverarbeitung erfolgt zur Bearbeitung gewerblicher B2B-Anfragen, Erstellung von Proforma-Rechnungen und Vertragsanbahnung gem. Art. 6 Abs. 1 lit. b und f DSGVO." },
             { heading: "Analyse- & Sitzungs-Cookies", text: "Wir verwenden ein einziges First-Party-HttpOnly-Cookie (__session) für die Admin-Authentifizierung und anonyme Besuchsstatistiken. Es werden weder localStorage, sessionStorage, IndexedDB noch Fingerprinting verwendet." },
             { heading: "Speicherdauer", text: "Anfragedaten werden gemäß den gesetzlichen handels- und steuerrechtlichen Aufbewahrungspflichten gespeichert und anschließend datenschutzkonform gelöscht." },
-            { heading: "Betroffenenrechte", text: "Sie haben das Recht auf Auskunft, Berichtigung und Löschung. Wenden Sie sich bitte an export@asiaplast.com.tr oder schriftlich an unser Exportbüro am World Trade Center (DTM), Bakırköy / Istanbul." }
+            { heading: "Betroffenenrechte", text: "Sie haben das Recht auf Auskunft, Berichtigung und Löschung. Wenden Sie sich bitte an export@asiaplastik.com.tr oder schriftlich an unser Exportbüro am World Trade Center (DTM), Bakırköy / Istanbul." }
         ]
     },
     fr: {
@@ -372,7 +372,7 @@ const privacy: Record<Active, LegalPage> = {
             { heading: "Finalités et Bases Légales", text: "Les données sont traitées pour l'établissement de propositions commerciales B2B, études de faisabilité et exécution contractuelle (Art. 6.1.b et 6.1.f RGPD)." },
             { heading: "Cookies Analytiques et de Session", text: "Un seul cookie first-party HttpOnly (__session) est utilisé pour l'authentification admin et les statistiques anonymes. Pas de localStorage, sessionStorage, IndexedDB ni d'empreinte d'appareil." },
             { heading: "Conservation des Données", text: "Les dossiers commerciaux sont conservés pendant les durées légales de prescription commerciale avant archivage sécurisé ou suppression." },
-            { heading: "Vos Droits", text: "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et d'effacement via export@asiaplast.com.tr ou auprès de notre Bureau Export au World Trade Center d'Istanbul." }
+            { heading: "Vos Droits", text: "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et d'effacement via export@asiaplastik.com.tr ou auprès de notre Bureau Export au World Trade Center d'Istanbul." }
         ]
     },
     ar: {
@@ -384,7 +384,7 @@ const privacy: Record<Active, LegalPage> = {
             { heading: "الغرض والأساس القانوني", text: "تُعالج البيانات لإعداد عروض الأسعار وفواتير البروفورما وتنفيذ عقود التصدير وفق المصلحة المشروعة والوفاء بالعقود." },
             { heading: "ملفات الجلسة والتحليلات", text: "نستخدم ملف تعريف ارتباط واحد HttpOnly (__session) لمصادقة الإدارة وإحصاءات الزيارة المجهولة. لا نستخدم localStorage أو sessionStorage أو IndexedDB أو بصمة الجهاز." },
             { heading: "فترة الاحتفاظ بالبيانات", text: "تُحفظ السجلات طوال الفترة القانونية والتجارية اللازمة ثم تُحذف أو تُعمّى بشكل آمن." },
-            { heading: "حقوقكم والتواصل", text: "يحق لكم طلب الوصول إلى البيانات أو تعديلها عبر مراسلة export@asiaplast.com.tr أو مراسلة مكتب التصدير الدولي في مركز التجارة العالمي، بكركوي / إسطنبول." }
+            { heading: "حقوقكم والتواصل", text: "يحق لكم طلب الوصول إلى البيانات أو تعديلها عبر مراسلة export@asiaplastik.com.tr أو مراسلة مكتب التصدير الدولي في مركز التجارة العالمي، بكركوي / إسطنبول." }
         ]
     }
 };

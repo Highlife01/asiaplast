@@ -1106,10 +1106,18 @@ export async function getCompanySettings(): Promise<CompanySettings> {
         }
         const d = snap.data() as Record<string, unknown>;
         const social = (d.socialLinks && typeof d.socialLinks === "object" ? d.socialLinks : {}) as Record<string, unknown>;
+        const storedEmail = String(d.email || "").trim();
+        const normalizedEmail =
+            !storedEmail || storedEmail === "export@asiaplast.com" || storedEmail === "export@asiaplast.com.tr"
+                ? DEFAULT_COMPANY_SETTINGS.email
+                : storedEmail;
+        if (storedEmail && normalizedEmail !== storedEmail) {
+            await ref.set({ email: normalizedEmail, updatedAt: new Date().toISOString() }, { merge: true }).catch(() => undefined);
+        }
         const result: CompanySettings = {
             name: String(d.name || DEFAULT_COMPANY_SETTINGS.name),
             legalName: String(d.legalName || DEFAULT_COMPANY_SETTINGS.legalName),
-            email: String(d.email || DEFAULT_COMPANY_SETTINGS.email),
+            email: normalizedEmail,
             phone: String(d.phone || DEFAULT_COMPANY_SETTINGS.phone),
             whatsapp: String(d.whatsapp || DEFAULT_COMPANY_SETTINGS.whatsapp),
             country: String(d.country || DEFAULT_COMPANY_SETTINGS.country),

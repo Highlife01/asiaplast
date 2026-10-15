@@ -132,7 +132,7 @@ export async function POST(request: Request) {
             .trim()
             .slice(0, 64);
 
-        const host = request.headers.get("x-forwarded-host") || request.headers.get("host") || "asiaplast.web.app";
+        const host = request.headers.get("x-forwarded-host") || request.headers.get("host") || "www.asiaplastik.com.tr";
         const referrer = sanitizeReferrer(body.referrer, host);
 
         const resRecord = await recordVisitorSessionEvent({

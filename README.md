@@ -2,7 +2,7 @@
 
 ASIAPLAST is an enterprise-grade international B2B showcase and RFQ (Request for Quotation) engine for wholesale garbage bags, industrial bin liners, and private-label OEM manufacturing.
 
-- **Production Domain**: `https://asiaplast.web.app`
+- **Production Domain**: `https://www.asiaplastik.com.tr`
 - **Firebase Project**: `ajansonline` (Europe West 1)
 - **Framework**: Next.js 14 (App Router) + Tailwind CSS + Firebase Admin SDK
 
@@ -53,7 +53,7 @@ cp .env.example .env.local
 
 Configure your variables (never commit real secrets):
 ```env
-NEXT_PUBLIC_SITE_URL=https://asiaplast.web.app
+NEXT_PUBLIC_SITE_URL=https://www.asiaplastik.com.tr
 ADMIN_EMAIL=
 ADMIN_PASSWORD=
 ADMIN_SESSION_SECRET=

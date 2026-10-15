@@ -1,11 +1,21 @@
 /** Shared configuration constants and status definitions (no secrets). */
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://asiaplast.web.app").replace(/\/$/, "");
+const rawSiteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "").trim().replace(/\/$/, "");
+export const SITE_URL =
+    !rawSiteUrl || rawSiteUrl.includes("asiaplast.web.app") || rawSiteUrl.includes("firebaseapp.com")
+        ? "https://www.asiaplastik.com.tr"
+        : rawSiteUrl;
+
+const rawContactEmail = (process.env.NEXT_PUBLIC_CONTACT_EMAIL || "").trim();
+const resolvedContactEmail =
+    !rawContactEmail || rawContactEmail === "export@asiaplast.com" || rawContactEmail === "export@asiaplast.com.tr"
+        ? "export@asiaplastik.com.tr"
+        : rawContactEmail;
 
 export const DEFAULT_COMPANY_SETTINGS = {
     name: "ASIAPLAST",
     legalName: "ASIAPLAST Plastik ve Ambalaj Sanayi",
-    email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "export@asiaplast.com",
+    email: resolvedContactEmail,
     phone: "+90 533 684 01 75",
     whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP || "+905336840175",
     country: process.env.NEXT_PUBLIC_CONTACT_COUNTRY || "Turkey",

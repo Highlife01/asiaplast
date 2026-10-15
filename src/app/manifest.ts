@@ -43,21 +43,21 @@ export default function manifest(): MetadataRoute.Manifest {
                 name: "Request Quote (RFQ)",
                 short_name: "RFQ",
                 description: "Get container-scale pricing and specification options",
-                url: "/en/quote",
+                url: "/quote",
                 icons: [{ src: "/icon.svg", sizes: "96x96" }]
             },
             {
                 name: "Product Catalog",
                 short_name: "Products",
                 description: "Browse heavy-duty, medical and industrial liners",
-                url: "/en/products",
+                url: "/products",
                 icons: [{ src: "/icon.svg", sizes: "96x96" }]
             },
             {
                 name: "Direct Contact Desk",
                 short_name: "Contact",
                 description: "Reach our global export sales office",
-                url: "/en/contact",
+                url: "/contact",
                 icons: [{ src: "/icon.svg", sizes: "96x96" }]
             }
         ]

@@ -9,7 +9,7 @@ import { loadCatalogProducts } from "@/lib/catalog";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getIndustries } from "@/lib/i18n/content";
 import { localeOrDefault } from "@/lib/i18n/requireLocale";
-import { buildMetadata, organizationJsonLd, faqJsonLd, breadcrumbJsonLd, localePath } from "@/lib/seo";
+import { buildMetadata, organizationJsonLd, websiteJsonLd, faqJsonLd, breadcrumbJsonLd, localePath } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +42,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     return (
         <>
             <JsonLd data={organizationJsonLd()} />
+            <JsonLd data={websiteJsonLd(l)} />
             <JsonLd data={faqJsonLd([...dict.faq])} />
             <JsonLd data={breadcrumbJsonLd([{ name: dict.nav.home, path: localePath(l, "/") }])} />
 

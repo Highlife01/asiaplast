@@ -222,8 +222,8 @@ export default function HeroSlider({ locale, whatsappNumber = "+90 533 684 01 75
 
     const whatsappPrefill = encodeURIComponent(
         locale === "tr"
-            ? `Merhaba ASIAPLAST, web sitenizden ulaşıyorum. "${title}" hakkında toptan teklif almak istiyorum.`
-            : `Hello ASIAPLAST, I am contacting you via asiaplast.web.app regarding "${title}". I would like to request a wholesale export quotation.`
+            ? `Merhaba ASIAPLAST, www.asiaplastik.com.tr web sitenizden ulaşıyorum. "${title}" hakkında toptan teklif almak istiyorum.`
+            : `Hello ASIAPLAST, I am contacting you via www.asiaplastik.com.tr regarding "${title}". I would like to request a wholesale export quotation.`
     );
 
     return (

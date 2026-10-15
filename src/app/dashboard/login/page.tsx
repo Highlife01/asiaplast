@@ -217,7 +217,7 @@ export default function DashboardLoginPage() {
                             className="input"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="ornek@asiaplast.com"
+                            placeholder="export@asiaplastik.com.tr"
                         />
                     </div>
 

@@ -236,6 +236,13 @@ export async function verifySameOrigin(request: Request): Promise<boolean> {
         if (originUrl.host === host) return true;
         if (originUrl.host === siteUrl.host) return true;
         if (originUrl.hostname === "localhost" || originUrl.hostname === "127.0.0.1") return true;
+        if (
+            originUrl.hostname === "asiaplastik.com.tr" ||
+            originUrl.hostname === "www.asiaplastik.com.tr" ||
+            originUrl.hostname.endsWith(".asiaplastik.com.tr")
+        ) {
+            return true;
+        }
         if (originUrl.hostname.endsWith(".web.app") || originUrl.hostname.endsWith(".firebaseapp.com")) {
             if (originUrl.hostname.startsWith("asiaplast")) return true;
         }

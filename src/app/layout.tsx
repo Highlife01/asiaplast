@@ -26,10 +26,14 @@ const notoArabic = Noto_Sans_Arabic({
 });
 
 export const viewport: Viewport = {
-    themeColor: "#0284c7",
+    themeColor: [
+        { media: "(prefers-color-scheme: light)", color: "#10b981" },
+        { media: "(prefers-color-scheme: dark)", color: "#0b1329" }
+    ],
     width: "device-width",
     initialScale: 1,
-    maximumScale: 5
+    maximumScale: 5,
+    viewportFit: "cover"
 };
 
 export const metadata: Metadata = {
@@ -61,14 +65,30 @@ export const metadata: Metadata = {
     creator: "ASIAPLAST",
     publisher: "ASIAPLAST",
     manifest: "/manifest.webmanifest",
+    formatDetection: {
+        telephone: false
+    },
     appleWebApp: {
         capable: true,
         statusBarStyle: "black-translucent",
         title: "ASIAPLAST"
     },
     icons: {
-        icon: "/icon.svg",
-        apple: "/icons/icon-192.svg"
+        icon: [
+            { url: "/favicon.ico", sizes: "48x48" },
+            { url: "/icon.svg", type: "image/svg+xml", sizes: "any" },
+            { url: "/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+            { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+            { url: "/favicon-48x48.png", type: "image/png", sizes: "48x48" },
+            { url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" },
+            { url: "/icons/icon-512.png", type: "image/png", sizes: "512x512" }
+        ],
+        shortcut: ["/favicon.ico"],
+        apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }]
+    },
+    other: {
+        "mobile-web-app-capable": "yes",
+        "msapplication-TileColor": "#0b1329"
     },
     openGraph: {
         type: "website",

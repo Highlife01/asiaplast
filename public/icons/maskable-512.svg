@@ -1,16 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="bg_mask" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#10243A" />
-      <stop offset="50%" stop-color="#0c4a6e" />
-      <stop offset="100%" stop-color="#19A974" />
+    <linearGradient id="ap-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="55%" stop-color="#19A974" />
+      <stop offset="100%" stop-color="#0f766e" />
     </linearGradient>
   </defs>
-  <!-- Full bleed background for maskable icon -->
-  <rect width="512" height="512" fill="url(#bg_mask)" />
-  <!-- Safe zone centered graphic (within 80% circle) -->
-  <g fill="#ffffff" transform="scale(0.8) translate(64, 64)">
-    <path d="M256 100 L380 380 L316 380 L292 320 L220 320 L196 380 L132 380 Z M256 195 L235 272 L277 272 Z" />
-    <circle cx="256" cy="410" r="16" fill="#38bdf8" />
-  </g>
+  <rect width="512" height="512" fill="url(#ap-bg)" />
+  <path
+    d="M256 128 L368 376 L305 376 L282 320 L230 320 L207 376 L144 376 Z M256 204 L239 274 L273 274 Z"
+    fill="#ffffff"
+  />
+  <circle cx="256" cy="404" r="15" fill="#a7f3d0" />
 </svg>

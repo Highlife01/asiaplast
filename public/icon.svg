@@ -1,4 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <rect width="32" height="32" rx="8" fill="#19A974" />
-  <text x="16" y="23" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="20" fill="#FFFFFF" text-anchor="middle">A</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="ap-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="55%" stop-color="#19A974" />
+      <stop offset="100%" stop-color="#0f766e" />
+    </linearGradient>
+    <linearGradient id="ap-glow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="url(#ap-bg)" />
+  <rect x="2" y="2" width="60" height="30" rx="13" fill="url(#ap-glow)" />
+  <path
+    d="M32 12 L49 50 L39.2 50 L35.8 41.5 L28.2 41.5 L24.8 50 L15 50 Z M32 23.5 L29.4 34.5 L34.6 34.5 Z"
+    fill="#ffffff"
+  />
+  <circle cx="32" cy="54" r="2.4" fill="#a7f3d0" />
 </svg>

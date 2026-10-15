@@ -1,19 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#10243A" />
-      <stop offset="50%" stop-color="#0c4a6e" />
-      <stop offset="100%" stop-color="#19A974" />
+    <linearGradient id="ap-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="55%" stop-color="#19A974" />
+      <stop offset="100%" stop-color="#0f766e" />
     </linearGradient>
-    <linearGradient id="shine" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25" />
+    <linearGradient id="ap-shine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.26" />
       <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
     </linearGradient>
   </defs>
-  <rect width="192" height="192" rx="42" fill="url(#bg)" />
-  <rect width="192" height="96" rx="42" fill="url(#shine)" />
-  <g fill="#ffffff">
-    <path d="M96 36 L144 146 L118 146 L108 122 L84 122 L74 146 L48 146 Z M96 74 L89 104 L103 104 Z" />
-    <circle cx="96" cy="156" r="6" fill="#38bdf8" />
-  </g>
+  <rect width="192" height="192" rx="44" fill="url(#ap-bg)" />
+  <rect x="6" y="6" width="180" height="90" rx="38" fill="url(#ap-shine)" />
+  <path
+    d="M96 36 L147 150 L118 150 L107.5 124.5 L84.5 124.5 L74 150 L45 150 Z M96 70.5 L88.2 103.5 L103.8 103.5 Z"
+    fill="#ffffff"
+  />
+  <circle cx="96" cy="162" r="7" fill="#a7f3d0" />
 </svg>

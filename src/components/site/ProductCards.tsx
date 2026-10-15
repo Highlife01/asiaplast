@@ -49,6 +49,9 @@ export function ProductCard({
                     <img
                         src={imageUrl}
                         alt={product.name}
+                        width={1200}
+                        height={896}
+                        decoding="async"
                         loading="lazy"
                         className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
@@ -111,6 +114,9 @@ export function CategoryCard({
                     <img
                         src={imageUrl}
                         alt={copy.name}
+                        width={1200}
+                        height={896}
+                        decoding="async"
                         loading="lazy"
                         className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />

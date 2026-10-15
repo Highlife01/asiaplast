@@ -104,10 +104,27 @@ export default function VisitBeacon({
             }
         }
 
-        void sendEvent();
+        const w = window as Window & {
+            requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+            cancelIdleCallback?: (id: number) => void;
+        };
+        let idleId: number | null = null;
+        let timerId: ReturnType<typeof setTimeout> | null = null;
+
+        if (typeof w.requestIdleCallback === "function") {
+            idleId = w.requestIdleCallback(() => void sendEvent(), { timeout: 1500 });
+        } else {
+            timerId = setTimeout(() => void sendEvent(), 600);
+        }
 
         return () => {
             cancelled = true;
+            if (idleId !== null && typeof w.cancelIdleCallback === "function") {
+                w.cancelIdleCallback(idleId);
+            }
+            if (timerId !== null) {
+                clearTimeout(timerId);
+            }
         };
     }, [enabled, pathname, searchParams, locale]);
 

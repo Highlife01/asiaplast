@@ -236,6 +236,8 @@ export default function HeroSlider({ locale, whatsappNumber = "+90 533 684 01 75
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
                 {SLIDES.map((slide, idx) => {
                     const isCurrent = idx === current;
+                    const isNext = idx === (current + 1) % SLIDES.length;
+                    const shouldRenderImg = idx === 0 || isCurrent || isNext;
                     const slideTitle = slide.title[locale] || slide.title.en || "AsiaPlast";
                     return (
                         <div
@@ -245,15 +247,20 @@ export default function HeroSlider({ locale, whatsappNumber = "+90 533 684 01 75
                                 isCurrent ? "opacity-100" : "opacity-0"
                             }`}
                         >
-                            <img
-                                src={slide.image}
-                                alt={slideTitle}
-                                fetchPriority={idx === 0 ? "high" : "auto"}
-                                loading={idx === 0 ? "eager" : "lazy"}
-                                className={`absolute inset-0 w-full h-full object-cover object-center transform transition-transform duration-[8000ms] ${
-                                    isCurrent ? "scale-105" : "scale-100"
-                                }`}
-                            />
+                            {shouldRenderImg && (
+                                <img
+                                    src={slide.image}
+                                    alt={slideTitle}
+                                    width={1376}
+                                    height={768}
+                                    decoding={idx === 0 ? "sync" : "async"}
+                                    fetchPriority={idx === 0 ? "high" : "low"}
+                                    loading={idx === 0 ? "eager" : "lazy"}
+                                    className={`absolute inset-0 w-full h-full object-cover object-center transform transition-transform duration-[8000ms] ${
+                                        isCurrent ? "scale-105" : "scale-100"
+                                    }`}
+                                />
+                            )}
                             <div
                                 className={`absolute inset-0 bg-gradient-to-r ${
                                     isRtl

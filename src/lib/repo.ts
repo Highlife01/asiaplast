@@ -907,12 +907,25 @@ export function mapProductDoc(id: string, raw: Record<string, unknown>): Product
     };
 }
 
+const SERVER_CACHE_TTL_MS = 60_000;
+let productsCache: { docs: ProductDoc[]; expiresAt: number } | null = null;
+let companySettingsCache: { data: CompanySettings; expiresAt: number } | null = null;
+
+export function invalidateCatalogAndSettingsCache(): void {
+    productsCache = null;
+    companySettingsCache = null;
+}
+
 export async function ensureSeedProductsInFirestore(): Promise<ProductDoc[]> {
+    if (productsCache && productsCache.expiresAt > Date.now()) {
+        return productsCache.docs;
+    }
     const col = db().collection(COLLECTIONS.products);
     const snap = await col.get();
     if (!snap.empty) {
         const docs = snap.docs.map((d) => mapProductDoc(d.id, d.data() as Record<string, unknown>));
         docs.sort((a, b) => a.sortOrder - b.sortOrder);
+        productsCache = { docs, expiresAt: Date.now() + SERVER_CACHE_TTL_MS };
         return docs;
     }
 
@@ -975,6 +988,7 @@ export async function ensureSeedProductsInFirestore(): Promise<ProductDoc[]> {
     }
 
     created.sort((a, b) => a.sortOrder - b.sortOrder);
+    productsCache = { docs: created, expiresAt: Date.now() + SERVER_CACHE_TTL_MS };
     return created;
 }
 
@@ -985,10 +999,9 @@ export async function getProducts(opts?: { includeInactive?: boolean }): Promise
 }
 
 export async function getProductBySlug(slug: string): Promise<ProductDoc | null> {
-    const snap = await db().collection(COLLECTIONS.products).where("slug", "==", slug).limit(1).get();
-    if (!snap.empty) {
-        const doc = mapProductDoc(snap.docs[0].id, snap.docs[0].data() as Record<string, unknown>);
-        return doc.active ? doc : null;
+    if (productsCache && productsCache.expiresAt > Date.now()) {
+        const cached = productsCache.docs.find((p) => p.slug === slug);
+        if (cached) return cached.active ? cached : null;
     }
     const all = await ensureSeedProductsInFirestore();
     return all.find((p) => p.slug === slug && p.active) || null;
@@ -1048,6 +1061,7 @@ export async function saveProduct(
                 });
         }
 
+        productsCache = null;
         await logAudit(by, "update_product", id, { slug: data.slug, prevSlug, active: data.active });
         return mapProductDoc(id, { ...prevData, ...updatedPayload });
     } else {
@@ -1057,6 +1071,7 @@ export async function saveProduct(
             updatedAt: now
         };
         const docRef = await col.add(payload);
+        productsCache = null;
         await logAudit(by, "create_product", docRef.id, { slug: data.slug, name: data.name });
         return mapProductDoc(docRef.id, payload);
     }
@@ -1064,6 +1079,7 @@ export async function saveProduct(
 
 export async function deleteProduct(id: string, by: string): Promise<void> {
     await db().collection(COLLECTIONS.products).doc(id).delete();
+    productsCache = null;
     await logAudit(by, "delete_product", id);
 }
 
@@ -1072,6 +1088,9 @@ export async function deleteProduct(id: string, by: string): Promise<void> {
 // ============================================================================
 
 export async function getCompanySettings(): Promise<CompanySettings> {
+    if (companySettingsCache && companySettingsCache.expiresAt > Date.now()) {
+        return companySettingsCache.data;
+    }
     try {
         const ref = db().collection(COLLECTIONS.settings).doc("company");
         const snap = await ref.get();
@@ -1082,11 +1101,12 @@ export async function getCompanySettings(): Promise<CompanySettings> {
                 updatedBy: "system"
             };
             await ref.set(init, { merge: true });
+            companySettingsCache = { data: init, expiresAt: Date.now() + SERVER_CACHE_TTL_MS };
             return init;
         }
         const d = snap.data() as Record<string, unknown>;
         const social = (d.socialLinks && typeof d.socialLinks === "object" ? d.socialLinks : {}) as Record<string, unknown>;
-        return {
+        const result: CompanySettings = {
             name: String(d.name || DEFAULT_COMPANY_SETTINGS.name),
             legalName: String(d.legalName || DEFAULT_COMPANY_SETTINGS.legalName),
             email: String(d.email || DEFAULT_COMPANY_SETTINGS.email),
@@ -1110,6 +1130,8 @@ export async function getCompanySettings(): Promise<CompanySettings> {
             updatedAt: d.updatedAt ? toIso(d.updatedAt) : null,
             updatedBy: d.updatedBy ? String(d.updatedBy) : null
         };
+        companySettingsCache = { data: result, expiresAt: Date.now() + SERVER_CACHE_TTL_MS };
+        return result;
     } catch {
         return {
             ...DEFAULT_COMPANY_SETTINGS,
@@ -1130,6 +1152,7 @@ export async function saveCompanySettings(
         updatedBy: by
     };
     await db().collection(COLLECTIONS.settings).doc("company").set(payload, { merge: true });
+    companySettingsCache = { data: payload, expiresAt: Date.now() + SERVER_CACHE_TTL_MS };
     await logAudit(by, "update_company_settings", "company", { email: settings.email, whatsapp: settings.whatsapp });
     return payload;
 }

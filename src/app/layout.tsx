@@ -121,6 +121,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
     return (
         <html lang={locale} dir={isRtl(locale) ? "rtl" : "ltr"} suppressHydrationWarning>
+            <head>
+                {/* Google tag (gtag.js) */}
+                <script async src="https://www.googletagmanager.com/gtag/js?id=G-393W2JTJ51" />
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', 'G-393W2JTJ51');`
+                    }}
+                />
+            </head>
             <body className={`${inter.variable} ${manrope.variable} ${notoArabic.variable} font-sans`}>
                 <PwaRegister />
                 {children}

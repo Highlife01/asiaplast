@@ -3,6 +3,7 @@
 import { useState, useMemo, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
     MESSAGE_STATUSES,
     MESSAGE_STATUS_LABELS_TR,
@@ -936,19 +937,19 @@ export default function DashboardClient({
             {/* Desktop Sidebar */}
             <aside className="hidden lg:flex lg:w-72 lg:flex-col lg:shrink-0 bg-brand-navy text-white border-r border-slate-800">
                 <div className="p-6 border-b border-white/10">
-                    <div className="flex items-center gap-3">
-                        <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-green font-display text-lg font-black text-white">
-                            A
-                        </span>
-                        <div>
-                            <p className="font-display text-lg font-black tracking-tight">
-                                ASIA<span className="text-brand-green">PLAST</span>
-                            </p>
-                            <p className="text-[11px] text-slate-400 font-medium">
-                                Kurumsal Yönetim Paneli
-                            </p>
-                        </div>
-                    </div>
+                    <Link href="/dashboard" className="block">
+                        <Image
+                            src="/images/logo-white.png"
+                            alt="ASIAPLAST"
+                            width={160}
+                            height={42}
+                            priority
+                            className="h-8 w-auto object-contain"
+                        />
+                        <p className="text-[11px] text-slate-400 font-medium mt-1.5">
+                            Kurumsal Yönetim Paneli
+                        </p>
+                    </Link>
                 </div>
 
                 <nav className="flex-1 p-4 space-y-1.5" aria-label="Yönetim Menüsü">
@@ -1014,13 +1015,14 @@ export default function DashboardClient({
             {/* Mobile Top Header & Drawer */}
             <div className="lg:hidden bg-brand-navy text-white border-b border-slate-800 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
                 <div className="flex items-center gap-2.5">
-                    <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-green font-display text-sm font-black">
-                        A
-                    </span>
-                    <div>
-                        <span className="font-display text-sm font-black">ASIAPLAST</span>
-                        <span className="block text-[10px] text-slate-400">Yönetim Paneli</span>
-                    </div>
+                    <Image
+                        src="/images/logo-white.png"
+                        alt="ASIAPLAST"
+                        width={130}
+                        height={34}
+                        className="h-6 w-auto object-contain"
+                    />
+                    <span className="text-[10px] text-slate-400 border-l border-white/20 pl-2">Yönetim Paneli</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <button

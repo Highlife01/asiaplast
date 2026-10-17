@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { LOCALE_META, ACTIVE_LOCALES, isLocale, type Locale } from "@/lib/i18n/locales";
@@ -47,13 +48,15 @@ export default function Header({
     return (
         <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 text-slate-800 backdrop-blur-xl supports-[backdrop-filter]:bg-white/80 shadow-xs transition-all duration-300">
             <div className="container-x flex h-16 sm:h-20 items-center justify-between gap-4">
-                <Link href={hrefFor(locale)} className="flex items-center gap-3 group" aria-label="ASIAPLAST home">
-                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brand-green to-brand-teal font-display text-lg font-black text-white shadow-md shadow-brand-green/20 group-hover:scale-105 transition-transform duration-200">
-                        A
-                    </span>
-                    <span className="font-display text-xl sm:text-2xl font-black tracking-tight text-slate-900">
-                        ASIA<span className="text-brand-green">PLAST</span>
-                    </span>
+                <Link href={hrefFor(locale)} className="flex items-center group py-1" aria-label="ASIAPLAST home">
+                    <Image
+                        src="/images/logo.png"
+                        alt="ASIAPLAST"
+                        width={220}
+                        height={57}
+                        priority
+                        className="h-9 sm:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
+                    />
                 </Link>
 
                 <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Locale } from "@/lib/i18n/locales";
 import { ACTIVE_LOCALES } from "@/lib/i18n/locales";
 import { getCategoryCopy } from "@/lib/i18n/content";
@@ -30,14 +31,15 @@ export default function Footer({
         <footer className="border-t border-slate-200/80 bg-slate-50 text-slate-600">
             <div className="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
-                    <div className="flex items-center gap-3">
-                        <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brand-green to-brand-teal font-display text-lg font-black text-white shadow-sm">
-                            A
-                        </span>
-                        <span className="font-display text-xl sm:text-2xl font-black tracking-tight text-slate-900">
-                            ASIA<span className="text-brand-green">PLAST</span>
-                        </span>
-                    </div>
+                    <Link href={localePath(locale, "/")} className="inline-block py-1" aria-label="ASIAPLAST home">
+                        <Image
+                            src="/images/logo.png"
+                            alt="ASIAPLAST"
+                            width={190}
+                            height={49}
+                            className="h-9 sm:h-10 w-auto object-contain"
+                        />
+                    </Link>
                     <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-600">{labels.company}</p>
                     {companySettings && (
                         <div className="mt-4 space-y-1 text-xs text-slate-500">

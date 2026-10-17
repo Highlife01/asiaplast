@@ -142,7 +142,7 @@ export function organizationJsonLd() {
         name: "ASIAPLAST",
         legalName: DEFAULT_COMPANY_SETTINGS.legalName,
         url: SITE_URL,
-        logo: `${SITE_URL}/icons/icon-512.png`,
+        logo: `${SITE_URL}/images/logo.png`,
         image: `${SITE_URL}/og-image.svg`,
         description:
             "Global garbage bags manufacturer and exporter: wholesale trash bags, industrial bin liners and private-label packaging solutions.",

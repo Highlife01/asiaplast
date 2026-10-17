@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function DashboardLoginPage() {
     const router = useRouter();
@@ -91,18 +92,18 @@ export default function DashboardLoginPage() {
         <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4 py-12 text-slate-900">
             <div className="w-full max-w-md rounded-3xl border border-slate-800 bg-white p-8 shadow-2xl">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                        <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brand-green to-brand-teal font-display text-lg font-black text-white shadow-md">
-                            A
+                    <div>
+                        <Image
+                            src="/images/logo.png"
+                            alt="ASIAPLAST"
+                            width={160}
+                            height={42}
+                            priority
+                            className="h-8 w-auto object-contain"
+                        />
+                        <span className="block mt-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                            Yönetim Paneli (/dashboard)
                         </span>
-                        <div>
-                            <span className="font-display text-lg font-black text-brand-navy">
-                                ASIA<span className="text-brand-green">PLAST</span>
-                            </span>
-                            <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                                Yönetim Paneli (/dashboard)
-                            </span>
-                        </div>
                     </div>
                     <Link
                         href="/"
